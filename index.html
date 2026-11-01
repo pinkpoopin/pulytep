@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CU-TEP Vocab">
+<meta name="theme-color" content="#F1F3F7">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>CU-TEP Vocab Drill — เกมฝึกคำศัพท์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1F3F7; --card:#FFFFFF; --ink:#171A21; --graphite:#7A808F; --rule:#DDE1E9;
+    --pink:#E4467C; --pink-soft:#FCE2EC; --green:#12735C; --red:#C62B3F;
+    --shadow:0 1px 0 rgba(23,26,33,.06), 0 8px 24px -16px rgba(23,26,33,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    background-image:linear-gradient(var(--rule) 1px,transparent 1px);
+    background-size:100% 28px;
+    color:var(--ink);
+    font-family:"IBM Plex Sans Thai","Anuphan",system-ui,sans-serif;
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+    padding:20px 14px 56px;
+  }
+  .wrap{max-width:660px;margin:0 auto}
+  .masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:14px}
+  .brand{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+  .brand b{color:var(--pink);font-weight:600}
+  .brand-sub{font-family:"Anuphan",sans-serif;font-size:13px;color:var(--graphite);letter-spacing:0;text-transform:none;font-weight:400;margin-top:2px}
+  .sheet-no{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--graphite);letter-spacing:.1em;text-align:right}
+
+  .sheet{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow);padding:22px 20px 20px}
+  .sheet::before,.sheet::after{content:"";position:absolute;width:9px;height:9px;background:var(--ink)}
+  .sheet::before{top:8px;left:8px}
+  .sheet::after{top:8px;right:8px}
+  .mark-bl,.mark-br{position:absolute;width:9px;height:9px;background:var(--ink);bottom:8px}
+  .mark-bl{left:8px}.mark-br{right:8px}
+  .ticks{position:absolute;left:8px;top:34px;bottom:34px;width:5px;display:flex;flex-direction:column;justify-content:space-between}
+  .ticks i{display:block;height:2px;background:var(--rule)}
+  .sheet-inner{padding-left:16px;padding-right:6px}
+
+  h1{font-family:"Anuphan",sans-serif;font-weight:700;font-size:clamp(24px,5.6vw,32px);line-height:1.25;margin:0 0 6px;letter-spacing:-.01em}
+  .lede{color:var(--graphite);font-size:14.5px;margin:0 0 22px;max-width:48ch}
+  .field{margin-bottom:20px}
+  .field-label{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--graphite);display:block;margin-bottom:9px}
+
+  .opts{display:flex;flex-direction:column;gap:7px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:11px 13px;font:inherit;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--pink);background:#fffafc}
+  .opt:disabled{cursor:default}
+  .opt:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+  .bub{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--graphite);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;color:var(--graphite);transition:.14s}
+  .opt .label{flex:1;min-width:0}
+  .opt .note{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--graphite)}
+  .opt.sel .bub,.opt[aria-pressed="true"] .bub{background:var(--ink);border-color:var(--ink);color:#fff;background-image:repeating-linear-gradient(52deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px)}
+  .opt.sel,.opt[aria-pressed="true"]{border-color:var(--ink)}
+  .opt.correct{border-color:var(--green);background:#F2FAF7}
+  .opt.correct .bub{background:var(--green);border-color:var(--green);color:#fff;background-image:repeating-linear-gradient(52deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px)}
+  .opt.wrong{border-color:var(--red);background:#FDF3F4}
+  .opt.wrong .bub{background:var(--red);border-color:var(--red);color:#fff}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:"Anuphan",sans-serif;font-weight:600;font-size:15px;padding:12px 22px;border-radius:3px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;transition:.12s}
+  .btn:hover{background:var(--pink);border-color:var(--pink)}
+  .btn:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .btn.ghost:hover{border-color:var(--ink);background:transparent;color:var(--ink)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:12.5px;padding:7px 13px;border:1px solid var(--rule);border-radius:999px;background:var(--card);cursor:pointer;color:var(--graphite);transition:.12s}
+  .chip:hover{border-color:var(--pink);color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--pink-soft);border-color:var(--pink);color:var(--pink);font-weight:500}
+  .chip:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+
+  select{font-family:"IBM Plex Sans Thai",sans-serif;font-size:14.5px;color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:10px 12px;width:100%;cursor:pointer;appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--graphite) 50%),linear-gradient(135deg,var(--graphite) 50%,transparent 50%);
+    background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  select:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+
+  .statusbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+  .metrics{display:flex;gap:18px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--graphite);text-transform:uppercase}
+  .metrics b{display:block;font-size:18px;letter-spacing:0;color:var(--ink);font-weight:600;line-height:1.2}
+  .metrics .hot b{color:var(--pink)}
+  .strip{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px}
+  .pip{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--rule);flex:none}
+  .pip.ok{background:var(--green);border-color:var(--green)}
+  .pip.no{background:var(--red);border-color:var(--red)}
+  .pip.now{border-color:var(--pink);box-shadow:0 0 0 2px var(--pink-soft)}
+  .timer{height:3px;background:var(--rule);border-radius:2px;overflow:hidden;margin-bottom:18px}
+  .timer i{display:block;height:100%;background:var(--pink);width:100%}
+  .timer.warn i{background:var(--red)}
+
+  .qtype{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--pink);margin-bottom:10px}
+  .prompt-word{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:clamp(30px,7.5vw,44px);letter-spacing:-.02em;line-height:1.15;margin:0 0 4px;word-break:break-word}
+  .prompt-th{font-family:"Anuphan",sans-serif;font-weight:600;font-size:clamp(24px,6vw,34px);line-height:1.3;margin:0 0 4px}
+  .pos{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--graphite);margin-bottom:20px}
+  .pron{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 20px;padding:9px 12px;border:1px solid var(--rule);border-left:3px solid var(--pink);border-radius:3px;background:#FDFAFB}
+  .pron .ipa{font-family:"IBM Plex Mono",monospace;font-size:16px;color:var(--ink)}
+  .pron .thai{font-family:"Anuphan",sans-serif;font-size:15px;color:var(--graphite)}
+  .say{flex:none;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--pink);background:var(--card);color:var(--pink);display:grid;place-items:center;cursor:pointer;padding:0;transition:.12s}
+  .say:hover{background:var(--pink);color:#fff}
+  .say:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+  .say svg{width:15px;height:15px;fill:currentColor}
+  .fb-pron{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--graphite);margin-top:4px}
+  .prompt-sent{font-size:18px;line-height:1.75;margin:0 0 22px}
+  .prompt-sent u{text-decoration:none;border-bottom:2px solid var(--pink);padding:0 22px;display:inline-block}
+
+  .typebox{display:flex;gap:8px;align-items:stretch;margin-bottom:4px}
+  .typebox input{flex:1;min-width:0;font-family:"IBM Plex Mono",monospace;font-size:20px;padding:12px 14px;border:1px solid var(--rule);border-bottom:2px solid var(--ink);border-radius:3px;background:#FAFBFD;color:var(--ink)}
+  .typebox input:focus{outline:none;border-bottom-color:var(--pink);background:#fff}
+  .typebox input:disabled{color:var(--graphite)}
+  .type-hint{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--graphite);margin-top:8px}
+
+  .feedback{margin-top:18px;padding:14px 15px;border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:3px;background:#FAFBFD;font-size:14.5px}
+  .feedback.good{border-left-color:var(--green)}
+  .feedback.bad{border-left-color:var(--red)}
+  .fb-head{font-family:"Anuphan",sans-serif;font-weight:600;margin-bottom:6px}
+  .fb-head.good{color:var(--green)}
+  .fb-head.bad{color:var(--red)}
+  .fb-word{font-family:"IBM Plex Mono",monospace;font-weight:500}
+  .fb-line{color:var(--graphite);font-size:13.5px;margin-top:4px}
+  .fb-line em{font-style:normal;color:var(--ink)}
+
+  .score-big{font-family:"IBM Plex Mono",monospace;font-size:clamp(48px,13vw,76px);font-weight:600;line-height:1;letter-spacing:-.03em;margin:2px 0}
+  .score-sub{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--graphite);letter-spacing:.1em;text-transform:uppercase;margin-bottom:22px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:24px}
+  .grid3 div{background:var(--card);padding:13px 12px}
+  .grid3 span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--graphite)}
+  .grid3 b{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600}
+  .missed{list-style:none;padding:0;margin:0 0 24px;border-top:1px solid var(--rule)}
+  .missed li{padding:11px 2px;border-bottom:1px solid var(--rule);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+  .missed .w{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:15px;min-width:140px}
+  .missed .m{color:var(--graphite);font-size:14px}
+
+  .hint{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--graphite);margin-top:10px;letter-spacing:.03em}
+  .warnline{font-size:13.5px;color:var(--red);margin-top:10px}
+  .hide{display:none !important}
+  @media (max-width:520px){
+    .sheet{padding:20px 12px 18px}
+    .sheet-inner{padding-left:12px;padding-right:0}
+    .metrics{gap:12px}
+    .missed .w{min-width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <div class="brand">CU-TEP <b>VOCAB</b> DRILL</div>
+      <div class="brand-sub" id="bankLine">คลังศัพท์วิชาการ</div>
+    </div>
+    <div class="sheet-no" id="sheetNo">FORM 01</div>
+  </div>
+
+  <div class="sheet">
+    <span class="mark-bl"></span><span class="mark-br"></span>
+    <div class="ticks" id="ticks"></div>
+    <div class="sheet-inner">
+
+      <!-- ============ START ============ -->
+      <section id="screenStart">
+        <h1>ฝนคำตอบให้ถูก ก่อนถึงวันสอบจริง</h1>
+        <p class="lede" id="lede"></p>
+
+        <div class="field">
+          <span class="field-label">รูปแบบคำถาม</span>
+          <div class="opts" id="modeOpts">
+            <button class="opt" data-mode="mixed" aria-pressed="true"><span class="bub">A</span><span class="label">สลับทุกรูปแบบ <span class="note">แนะนำ</span></span></button>
+            <button class="opt" data-mode="meaning" aria-pressed="false"><span class="bub">B</span><span class="label">ศัพท์ → ความหมายไทย <span class="note">มีคำอ่าน + เสียง</span></span></button>
+            <button class="opt" data-mode="reverse" aria-pressed="false"><span class="bub">C</span><span class="label">ความหมายไทย → ศัพท์</span></button>
+            <button class="opt" data-mode="typing" aria-pressed="false"><span class="bub">D</span><span class="label">พิมพ์คำศัพท์เอง <span class="note">ฝึกสะกด</span></span></button>
+            <button class="opt" data-mode="synonym" aria-pressed="false"><span class="bub">E</span><span class="label">คำที่ใกล้เคียงที่สุด <span class="note">แบบ Reading</span></span></button>
+            <button class="opt" data-mode="cloze" aria-pressed="false"><span class="bub">F</span><span class="label">เติมคำในประโยค</span></button>
+          </div>
+          <div class="hint" id="modeNote"></div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">ขอบเขตคำศัพท์</span>
+          <select id="scopeSel"></select>
+          <div class="hint" id="scopeNote"></div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">จำนวนข้อ</span>
+          <div class="chips" id="lenChips">
+            <button class="chip" data-len="10" aria-pressed="true">10 ข้อ</button>
+            <button class="chip" data-len="20" aria-pressed="false">20 ข้อ</button>
+            <button class="chip" data-len="30" aria-pressed="false">30 ข้อ</button>
+            <button class="chip" data-len="50" aria-pressed="false">50 ข้อ</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">ตัวเลือกเพิ่มเติม</span>
+          <div class="chips">
+            <button class="chip" id="timerChip" aria-pressed="true">จับเวลา 20 วิ/ข้อ</button>
+            <button class="chip" id="weakChip" aria-pressed="false">เฉพาะคำที่เคยตอบผิด</button>
+          </div>
+          <div class="hint" id="weakCount"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" id="startBtn">เริ่มทำข้อสอบ</button>
+          <button class="btn ghost" id="resetBtn">ล้างสถิติ</button>
+        </div>
+        <div class="hint" id="lifetime"></div>
+        <div class="warnline hide" id="poolWarn"></div>
+      </section>
+
+      <!-- ============ PLAY ============ -->
+      <section id="screenPlay" class="hide">
+        <div class="statusbar">
+          <div class="metrics">
+            <div><span>ข้อ</span><b id="mNum">1/10</b></div>
+            <div><span>คะแนน</span><b id="mScore">0</b></div>
+            <div class="hot"><span>ต่อเนื่อง</span><b id="mStreak">0</b></div>
+          </div>
+          <button class="btn ghost" id="quitBtn" style="padding:7px 13px;font-size:13px">ออก</button>
+        </div>
+        <div class="strip" id="strip"></div>
+        <div class="timer" id="timerBar"><i></i></div>
+        <div class="qtype" id="qType"></div>
+        <div id="promptBox"></div>
+        <div class="opts" id="answerOpts"></div>
+        <div id="feedback"></div>
+        <div class="btn-row" id="nextRow" style="display:none">
+          <button class="btn" id="nextBtn">ข้อถัดไป</button>
+        </div>
+        <div class="hint" id="keyHint"></div>
+      </section>
+
+      <!-- ============ RESULT ============ -->
+      <section id="screenResult" class="hide">
+        <div class="qtype">ผลการทำข้อสอบ</div>
+        <div class="score-big" id="rScore">0</div>
+        <div class="score-sub" id="rVerdict">คะแนนรวม</div>
+        <div class="grid3">
+          <div><span>ถูก</span><b id="rCorrect">0</b></div>
+          <div><span>ความแม่นยำ</span><b id="rAcc">0%</b></div>
+          <div><span>ต่อเนื่องสูงสุด</span><b id="rStreak">0</b></div>
+        </div>
+        <div id="missedBox">
+          <span class="field-label">คำที่ต้องกลับมาทบทวน</span>
+          <ul class="missed" id="missedList"></ul>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="againBtn">ทำชุดใหม่</button>
+          <button class="btn ghost" id="drillBtn">ฝึกเฉพาะคำที่ผิด</button>
+          <button class="btn ghost" id="homeBtn">กลับหน้าแรก</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   คลังคำศัพท์
+   ---------------------------------------------------------------------
+   BANK_FULL  = คำที่มีข้อมูลครบ เล่นได้ทุกโหมด
+       รูปแบบ: คำ|ชนิดคำ|ความหมายไทย|นิยามอังกฤษ|คำเหมือน|กลุ่มความหมาย|ประโยค (ใช้ ___ แทนช่องว่าง)
+   BANK_BASIC = คำที่มีเฉพาะความหมาย เล่นได้โหมด B, C, D
+       รูปแบบ: คำ|ชนิดคำ|ความหมายไทย
+   "กลุ่มความหมาย" ใส่เมื่อคำนั้นแปลใกล้กับคำอื่น เพื่อกันไม่ให้ถูกสุ่มมาเป็นตัวเลือกในข้อเดียวกัน (เว้นว่างได้)
+   ===================================================================== */
+const BANK_FULL = `
+abandon|v|ละทิ้ง ทอดทิ้ง|to leave or give up completely|forsake|stop|Rescuers had to ___ the search after nightfall.
+abound|v|มีอยู่ดาษดื่น มีอย่างล้นเหลือ|to exist in very large numbers|teem|many|Fish ___ in the shallow waters around the reef.
+abstract|adj|เป็นนามธรรม จับต้องไม่ได้|based on ideas rather than physical things|theoretical||Justice is an ___ concept that resists simple definition.
+abundant|adj|มีอยู่มากมาย อุดมสมบูรณ์|existing in large quantities|plentiful||Rainfall is ___ in the tropics, so irrigation is rarely necessary.
+academic|adj|ทางวิชาการ|relating to education, study or scholarship|scholarly||Her ___ record won her a place at three universities.
+accelerate|v|เร่งให้เร็วขึ้น|to increase in speed or rate|hasten||Rising temperatures ___ the melting of glaciers.
+access|n/v|เข้าถึง|the right or means to reach or use something|entry||Rural clinics still lack reliable ___ to electricity.
+accommodate|v|รองรับ จัดที่ให้|to provide space or adapt to needs|house||The new terminal can ___ forty million passengers a year.
+accompany|v|ไปเป็นเพื่อน/ประกอบกับ|to go along with, or to occur together with|escort||Fever may ___ the rash in the first two days.
+accumulate|v|สะสมพอกพูน|to gather an increasing amount over time|amass||Sediment continues to ___ at the mouth of the river.
+accurate|adj|แม่นยำ|correct in every detail|exact|exact|Early maps were rarely ___ about distances at sea.
+achieve|v|บรรลุ|to succeed in reaching a goal|accomplish|get|Few countries will ___ the emissions target on time.
+acknowledge|v|ยอมรับ รับรู้|to admit that something is true|admit||The report failed to ___ the scale of the problem.
+acquire|v|ได้มา ครอบครอง|to come to possess something|obtain|get|Children ___ a second language most easily before puberty.
+acute|adj|รุนแรงเฉียบพลัน, แหลมคม|severe and sudden, or very perceptive|severe||The region faces an ___ shortage of midwives.
+adapt|v|ปรับตัวให้เข้ากับ|to change to suit new conditions|adjust|change|Species that cannot ___ to warming seas will disappear.
+adequate|adj|เพียงพอ พอเหมาะ|enough in quantity or quality|sufficient|enough|The village still lacks ___ access to clean water.
+adhere|v|ยึดติด, ยึดมั่นปฏิบัติตาม|to stick fast to, or to follow a rule closely|cling|follow|Staff must ___ strictly to the sterilisation procedure.
+adjacent|adj|ที่อยู่ติดกัน|next to or adjoining something|neighbouring||The laboratory is ___ to the main lecture hall.
+adjust|v|ปรับเปลี่ยน|to change slightly to fit new conditions|adapt|change|Drivers must ___ their speed in heavy fog.
+administer|v|บริหาร/จัดการ|to manage the running of something|manage||A board of trustees will ___ the fund.
+administration|n|การบริหาร/การจัดการ|the process or people managing an organisation|management||The ___ of the grant proved unexpectedly complicated.
+adolescent|n|วัยรุ่น|a young person between child and adult|teenager||Sleep patterns shift markedly during the ___ years.
+adopt|v|รับเลี้ยง/นำมาใช้|to take up a practice, or to take a child legally|embrace||Several provinces plan to ___ the same testing system.
+adult|n/adj|ผู้ใหญ่/โตเต็มวัย|a fully grown person|grown-up||The programme offers evening classes for ___ learners.
+adverse|adj|ที่เป็นผลร้าย ไม่เอื้ออำนวย|harmful or unfavourable|unfavourable|harm|The drug was withdrawn after patients reported ___ side effects.
+advocate|v|สนับสนุน เรียกร้องให้มี|to publicly recommend or support|champion||Several economists ___ a higher carbon tax.
+aesthetic|adj|เกี่ยวกับความงาม|concerned with beauty or artistic taste|artistic||The renovation was driven by ___ rather than practical concerns.
+affect|v|ส่งผลกระทบ|to have an influence on something|influence||Rising rents ___ younger households most severely.
+aggregate|n|ผลรวมทั้งหมด|a total formed from many separate items|total||In ___, the three studies surveyed twelve thousand people.
+albeit|conj|แม้ว่า|although; even though|though||The plan was approved, ___ with major revisions.
+alleviate|v|บรรเทา ทำให้ทุเลาลง|to make pain or a problem less severe|relieve|reduce|A new bypass was built to ___ traffic congestion downtown.
+allocate|v|จัดสรร แบ่งปันให้|to distribute resources for a purpose|assign|give|The ministry will ___ additional funds to rural schools.
+alter|v|เปลี่ยนแปลง แก้ไข|to change in character or composition|modify|change|Nothing in the new evidence should ___ the original conclusion.
+alternative|n/adj|ทางเลือก|another possibility that can be chosen|option||Rail freight is a cleaner ___ to road transport.
+ambiguous|adj|กำกวม ตีความได้หลายทาง|open to more than one interpretation|unclear||The wording was so ___ that both sides claimed victory.
+ambition|n|ความทะเยอทะยาน|a strong desire to achieve something|aspiration||Her ___ was to establish a research centre in Chiang Mai.
+amend|v|แก้ไข|to make small changes to a text or law|revise|change|Parliament voted to ___ the constitution.
+amphibian|n|สัตว์ครึ่งบกครึ่งน้ำ|an animal able to live both in water and on land|frog-like animal||Pollution has halved the ___ population of the wetland.
+ample|adj|มีเหลือเฟือ กว้างขวางพอ|more than enough|plentiful|enough|There is ___ evidence that the practice is unsafe.
+analogy|n|การเปรียบเทียบให้เห็นภาพ|a comparison between two similar things|comparison||He drew an ___ between the brain and a telephone exchange.
+analyze|v|วิเคราะห์|to examine something in detail to understand it|examine||Statisticians will ___ the raw data next month.
+ancestor|n|บรรพบุรุษ|a person from whom one is descended|forebear||Their ___s settled the valley eight centuries ago.
+ancient|adj|โบราณ เก่าแก่|belonging to the very distant past|age-old||The ___ irrigation canals are still partly in use.
+annual|adj|ประจำปี|happening once every year|yearly||The society publishes an ___ report on air quality.
+anticipate|v|คาดการณ์ล่วงหน้า|to expect something to happen|expect||Economists ___ a slowdown in the second half of the year.
+apparent|adj|ที่เห็นได้ชัด, ที่ดูเหมือนว่า|clearly visible or seeming to be true|evident|clear|It soon became ___ that the data had been altered.
+append|v|เพิ่มเติม/ต่อท้าย|to add something to the end of a document|attach||Please ___ your references to the final page.
+appendix|n|ภาคผนวก|extra material added at the end of a document|supplement||Full tables appear in the ___ at the back.
+apply|v|นำไปใช้, ยื่นสมัคร|to put something into practical use, or to make a formal request|employ||The same principle does not ___ to liquids.
+appraisal|n|การประเมินค่า|a considered judgement of value or quality|assessment|check|The bank ordered an independent ___ of the property.
+appreciate|v|เห็นคุณค่า|to recognise the value of something|value||Few readers ___ how long the translation took.
+approach|n/v|วิธีการ/เข้าหา|a way of dealing with a problem|method||The team took a statistical ___ to the question.
+appropriate|adj|เหมาะสม|suitable for a particular situation|suitable||The tone of the letter was hardly ___.
+approximate|adj|โดยประมาณ|nearly but not exactly correct|rough||These are ___ figures, subject to revision.
+arbitrary|adj|ตามอำเภอใจ ไร้หลักเกณฑ์|based on personal whim rather than reason|random||Students complained that the grading criteria seemed ___.
+architecture|n|สถาปัตยกรรม|the design and style of buildings|building design||Colonial ___ still dominates the riverfront.
+archive|n|หอจดหมายเหตุ|a collection of historical records|repository||The national ___ holds letters from the 1890s.
+arduous|adj|ยากลำบาก ตรากตรำ|involving great effort and endurance|strenuous||The climb to the summit is long and ___.
+area|n|พื้นที่/ขอบเขต|a part of a place, subject or surface|region||Flooding affected a wide ___ of the delta.
+arid|adj|แห้งแล้ง ฝนตกน้อยมาก|having little rainfall and almost no vegetation|parched||Only hardy shrubs survive in the ___ interior.
+artifact|n|โบราณวัตถุที่มนุษย์สร้าง|an object made by a human, especially a historical one|relic||Every ___ was photographed before removal.
+artificial|adj|ที่มนุษย์สร้างขึ้น ไม่เป็นธรรมชาติ|made by people rather than occurring naturally|synthetic||The lake is entirely ___, created by the dam.
+ascertain|v|สืบให้แน่ชัด|to find something out with certainty|determine||Investigators are trying to ___ the cause of the crash.
+aspect|n|มุมมอง|one part or feature of something|facet||This ___ of the theory has received little attention.
+aspiration|n|ความทะเยอทะยาน|a strong hope or ambition|ambition||University is beyond the ___ of many rural students.
+aspire|v|ใฝ่ฝันจะเป็น|to direct one's hopes toward an achievement|aim||Many graduates ___ to positions in the civil service.
+assemble|v|ประกอบ/รวมตัว|to gather people or fit parts together|gather||Workers ___ the components by hand.
+assert|v|ยืนกรานอ้างว่า|to state something firmly and confidently|declare||Critics ___ that the survey was poorly designed.
+assess|v|ประเมิน ตีค่า|to judge the quality or value of something|evaluate|check|Researchers used a survey to ___ public attitudes toward nuclear power.
+assign|v|มอบหมาย|to give a task or resource to someone|allot|give|Editors ___ each manuscript to two reviewers.
+assimilate|v|ซึมซับ กลมกลืนเข้ากับ|to absorb and integrate into a whole|absorb|combine|Immigrants tend to ___ more quickly in smaller towns.
+assist|v|ช่วยเหลือ|to help someone do something|help||Volunteers will ___ with the registration of voters.
+assume|v|สมมติ|to accept something as true without proof|suppose|guess|We should not ___ that the pattern will continue.
+assure|v|ทำให้มั่นใจ|to tell someone confidently that something is true|reassure|sure|The mayor sought to ___ residents that the water was safe.
+asteroid|n|ดาวเคราะห์น้อย|a small rocky body orbiting the sun|minor planet||A large ___ passed within a million kilometres.
+atmosphere|n|ชั้นบรรยากาศ|the layer of gases surrounding a planet|air||Most meteors burn up in the upper ___.
+atom|n|อะตอม|the smallest unit of a chemical element|element unit||A single ___ of carbon has six protons.
+attach|v|แนบ/ติด|to fasten or join one thing to another|fasten||Please ___ a copy of your transcript.
+attain|v|บรรลุเป้าหมาย|to reach a level or goal after effort|achieve|get|Few students ___ full marks in the listening section.
+attitude|n|ทัศนคติ|a settled way of thinking about something|outlook||Public ___ toward recycling has changed sharply.
+attribute|v|ถือว่าเป็นผลมาจาก|to regard something as caused by|ascribe||Historians ___ the collapse of the empire to prolonged drought.
+augment|v|เพิ่มพูนให้มากขึ้น|to make something greater by adding to it|increase|more|Farmers ___ their income by selling honey.
+author|n|ผู้เขียน|the writer of a book or report|writer||The lead ___ declined to comment on the findings.
+authority|n|อำนาจ|the power to give orders, or an official body|jurisdiction||Only the port ___ may issue such a permit.
+authorize|v|อนุมัติ ให้อำนาจอย่างเป็นทางการ|to give official permission for something|approve|allow|Only the director may ___ payments above that amount.
+automate|v|ทำให้เป็นอัตโนมัติ|to make a process run by machine|mechanise||Banks continue to ___ routine paperwork.
+available|adj|ที่มีอยู่/ว่าง|able to be obtained or used|obtainable||Only two rooms remain ___ for the conference.
+avert|v|หลีกเลี่ยง ป้องกันไม่ให้เกิด|to prevent something bad from happening|prevent||Prompt action may ___ a full-scale water crisis.
+aware|adj|ตระหนัก|having knowledge of a situation|conscious||Few consumers are ___ of how the data is used.
+axis|n|แกนหมุน|an imaginary line about which a body rotates|pivot line||The earth's ___ tilts by about twenty-three degrees.
+barrier|n|อุปสรรค สิ่งกีดขวาง|something that blocks progress or access|obstacle||Cost remains the main ___ to adopting the technology.
+basin|n|แอ่ง, ลุ่มน้ำ|a bowl-shaped depression, or an area drained by a river|hollow||The river ___ supports twelve million people.
+basis|n|หลักเกณฑ์|the underlying support or reason for something|foundation||The claim rests on a very narrow ___.
+behalf|n|ในนามของ/ตัวแทน|in the interest or representation of someone|representation||He accepted the prize on ___ of the whole team.
+beneficial|adj|ที่เป็นประโยชน์|having a good effect|advantageous||Moderate exercise is ___ at almost any age.
+benefit|n/v|ประโยชน์|an advantage gained from something|advantage||The main ___ of the scheme is lower fuel use.
+bias|n|อคติ ความลำเอียง|an unfair preference or prejudice|prejudice||The study was criticised for sampling ___.
+binary|adj|ที่มีสองสถานะ, เลขฐานสอง|consisting of two parts or states|dual||The debate is often framed in ___ terms.
+bizarre|adj|แปลกประหลาด|very strange or unusual|peculiar||Witnesses described a ___ sequence of events.
+blunder|n|ความผิดพลาดร้ายแรง|a careless and serious mistake|error||The invasion is now regarded as a strategic ___.
+bond|n|พันธะ|a link that joins things or people|tie||A strong ___ formed between the two research groups.
+breakthrough|n|ความก้าวหน้าครั้งสำคัญ|an important sudden advance|advance||The vaccine represented a genuine scientific ___.
+brief|adj|สรุป/สั้น|lasting a short time; using few words|short||The chairman gave a ___ account of the delay.
+brittle|adj|เปราะ แตกหักง่าย|hard but liable to break easily|crumbly||Cold makes the plastic housing dangerously ___.
+bulk|n|จำนวนมาก|the greater part of something|majority||The ___ of the harvest is exported to China.
+canyon|n|หุบเขาลึกผาชัน|a deep gorge with steep sides|gorge||The ___ was cut by a river over two million years.
+capability|n|ความสามารถ|the power or ability to do something|ability||The country lacks the ___ to refine its own oil.
+capable|adj|มีความสามารถที่จะ|having the ability to do something|able||The telescope is ___ of detecting planets outside our galaxy.
+capacity|n|ความจุ|the maximum amount something can hold or do|volume||The stadium has a ___ of sixty thousand.
+category|n|หมวดหมู่|a class of things sharing characteristics|class||Each species falls into one of four ___s.
+cease|v|หยุด ยุติลง|to stop happening or doing something|halt|stop|Fighting did not ___ until late December.
+celestial|adj|เกี่ยวกับท้องฟ้าและดวงดาว|relating to the sky or outer space|heavenly||Ancient sailors navigated by ___ observation.
+challenge|n/v|ท้าทาย|something difficult that tests ability|test||Feeding the city remains the greatest ___.
+channel|n|ช่องทาง|a route through which something passes|route||Social media has become a major news ___.
+chapter|n|บท|a main division of a book|section||The final ___ deals with policy recommendations.
+chart|n|แผนภูมิ|a diagram showing information visually|graph||The ___ tracks rainfall over four decades.
+chemical|adj/n|สารเคมี|a substance used in or produced by chemistry|compound||Farmers apply the ___ before the rains begin.
+chronic|adj|เรื้อรัง ยืดเยื้อยาวนาน|lasting a long time and hard to cure|persistent||The city suffers from ___ water shortages.
+circulate|v|หมุนเวียน แพร่กระจายไปทั่ว|to move continuously through a system or group|spread||Blood ___s through the lungs before reaching the body.
+circumstance|n|สถานการณ์|a condition or fact affecting a situation|condition||Under no ___ should the sample be frozen.
+cite|v|อ้างอิง ยกมาอ้าง|to refer to a source as evidence|quote||Authors must ___ every source used in the paper.
+civil|adj|พลเรือน|relating to ordinary citizens rather than the military|civilian||The dispute was settled in a ___ court.
+civilization|n|อารยธรรม|an advanced and organised human society|society||The ___ collapsed within two generations of the drought.
+clarify|v|ทำให้กระจ่างชัด|to make something easier to understand|explain|clear|The minister was asked to ___ his earlier remarks.
+classic|adj|คลาสสิก|of recognised and lasting quality|timeless||The paper is a ___ example of careful fieldwork.
+clause|n|อนุประโยค, ข้อกำหนดในสัญญา|a section of a legal document, or a grammatical unit|provision||A ___ in the lease forbids subletting.
+climate|n|ภูมิอากาศ|the usual weather conditions of an area|weather pattern||The ___ of the plateau is cooler and drier.
+code|n|รหัส|a system of rules, or a set of symbols|cipher||All members must follow the professional ___ of conduct.
+coherent|adj|ต่อเนื่องเป็นเหตุเป็นผล|logical and consistent|logical||A good essay must present a ___ argument from start to finish.
+coincide|v|เกิดขึ้นพร้อมกัน, ตรงกัน|to happen at the same time or match|correspond||The festival will ___ with the start of the rainy season.
+collaborate|v|ร่วมมือกันทำงาน|to work jointly with others|cooperate||Three universities will ___ on the marine survey.
+collapse|v|ทรุดตัวลง ล่มสลาย|to fall down or fail suddenly|crumble||Fish stocks may ___ if quotas are not enforced.
+colleague|n|เพื่อนร่วมงาน|a person you work with|coworker||A former ___ verified the calculations.
+collect|v|สะสม|to gather things together|gather||Volunteers ___ water samples every fortnight.
+combine|v|รวมกัน|to join two or more things together|merge|combine|The study will ___ interviews with census data.
+comet|n|ดาวหาง|an icy body that develops a tail near the sun|tailed body||The ___ returns to the inner solar system every seventy years.
+commence|v|เริ่มต้น|to begin something formally|begin|start|Construction is expected to ___ in the third quarter.
+comment|n|ความคิดเห็น|a spoken or written remark|remark||The minister refused to ___ on the leaked memo.
+commerce|n|การค้าพาณิชย์|the buying and selling of goods on a large scale|trade||The port handled most of the kingdom's ___.
+commission|n|คณะกรรมการ|a group given official authority to do something|committee||A royal ___ examined the causes of the collapse.
+commit|v|ผูกมัด/กระทำผิด|to promise to do something, or to carry out an act|pledge||Donors must ___ to at least three years of support.
+commitment|n|ความผูกมัด|a promise or dedication to something|pledge||The plan requires a long-term ___ of funds.
+commodity|n|สินค้า|a raw material or product that is traded|good||Rubber remains the region's most valuable ___.
+communicate|v|สื่อสาร|to share information with others|convey||Scientists must learn to ___ risk clearly.
+community|n|ชุมชน|a group of people living in one place or sharing interests|society||The fishing ___ opposed the new harbour.
+comparable|adj|ที่เทียบเคียงกันได้|similar enough to be compared|equivalent||Wages here are ___ to those in neighbouring countries.
+compatible|adj|ที่เข้ากันได้|able to exist or work together|consistent||The findings are ___ with earlier laboratory results.
+compel|v|บังคับ ทำให้จำต้อง|to force someone to do something|force||Financial pressure may ___ the airline to cut routes.
+compensate|v|ชดเชย ทดแทน|to make up for loss or damage|reimburse||The airline agreed to ___ passengers for the delay.
+compile|v|รวบรวมเรียบเรียง|to collect material and put it together|assemble||Volunteers helped ___ a database of local plants.
+complement|v|เสริมให้สมบูรณ์|to add to something in a way that improves it|supplement||Fieldwork should ___ rather than replace laboratory study.
+complex|adj|ซับซ้อน|made of many connected parts and hard to understand|complicated||Monsoon systems are notoriously ___.
+compliance|n|การปฏิบัติตามกฎ|the act of obeying a rule or request|obedience|follow|Factories must demonstrate ___ with the safety code.
+component|n|ส่วนประกอบ|one part of a larger whole|part||Each ___ is tested separately before assembly.
+compound|n|สารประกอบ|a substance made of two or more elements|mixture||The plant produces a ___ used in painkillers.
+comprehensive|adj|ครอบคลุมรอบด้าน|including everything that is necessary|thorough||The committee published a ___ review of the energy policy.
+comprise|v|ประกอบด้วย|to consist of or be made up of|contain|combine|The archipelago ___ more than three hundred islands.
+compute|v|คำนวณ|to calculate a result|calculate||The model can ___ tidal ranges for any date.
+conceal|v|ปกปิด ซ่อนเร้น|to keep something hidden|hide||The firm was fined for attempting to ___ its losses.
+concede|v|ยอมรับ ยอมจำนน|to admit that something is true after resisting|admit||The company was forced to ___ that the figures were wrong.
+conceive|v|คิดขึ้นได้, ตั้งครรภ์|to form an idea in the mind|imagine||It is hard to ___ of a fairer system.
+concentrate|v|จดจ่อ|to focus attention or gather in one place|focus||Industry tends to ___ near deep-water ports.
+concept|n|แนวคิด|an abstract idea|notion||The ___ of sustainability entered policy in the 1980s.
+concise|adj|กระชับ สั้นได้ใจความ|giving much information in few words|succinct|short|The abstract must be ___ and free of jargon.
+conclude|v|สรุป|to decide after reasoning, or to bring to an end|infer||The panel will ___ its hearings in March.
+concrete|adj|ที่เป็นรูปธรรม จับต้องได้|definite and specific rather than general|tangible||The talks produced no ___ proposals.
+concurrent|adj|ที่เกิดขึ้นพร้อมกัน|happening at the same time|simultaneous||Three ___ trials were run in different provinces.
+conduct|v|ดำเนินการ|to organise and carry out an activity|carry out||Researchers will ___ interviews in four languages.
+confer|v|ปรึกษาหารือ, มอบให้|to discuss with others, or to grant formally|consult||The judges withdrew to ___ before announcing a winner.
+confine|v|จำกัดให้อยู่ในขอบเขต|to keep within limits|restrict||Officials tried to ___ the outbreak to a single province.
+confirm|v|ยืนยัน|to establish that something is true|verify|sure|Laboratory tests later ___ the diagnosis.
+conflict|n/v|ขัดแย้ง|a serious disagreement or clash|dispute||The border ___ displaced thousands of families.
+conform|v|ทำตามแบบแผน|to comply with rules or standards|comply|follow|All exports must ___ to European safety standards.
+consecutive|adj|ที่ติดต่อกันตามลำดับ|following one after another without a break|successive||The city recorded its fourth ___ month of falling exports.
+consent|n|ความยินยอม|permission for something to happen|permission||No treatment may begin without written ___.
+consequent|adj|ที่ตามมา|following as a result of something|resulting||Deforestation and the ___ soil loss worry planners.
+conservative|adj|ที่ระมัดระวัง, อนุรักษ์นิยม|cautious, or opposed to sudden change|cautious||Even by ___ estimates, the damage exceeds a billion baht.
+considerable|adj|มากพอสมควร|large in amount or extent|substantial|big|The proposal has attracted ___ public interest.
+consist|v|ประกอบด้วย|to be made up of certain parts|comprise|combine|The committee will ___ of nine elected members.
+consistent|adj|เสมอต้นเสมอปลาย ไม่ขัดแย้งกัน|unchanging over time, or in agreement with|steady||Her results were ___ across all three trials.
+consolidate|v|รวบรวมให้เป็นปึกแผ่น|to combine things into one stronger whole|unite|combine|The three agencies will ___ their records into one database.
+conspicuous|adj|สะดุดตา เห็นได้ชัดแต่ไกล|easily noticed and standing out|noticeable||The tower is the most ___ landmark for miles.
+constant|adj|คงที่|happening continuously or not changing|steady||The engine must run at a ___ temperature.
+constitute|v|ประกอบขึ้นเป็น|to form or make up something|comprise|combine|Women ___ nearly half of the country's workforce.
+constrain|v|จำกัด บีบบังคับ|to limit or restrict freedom of action|limit|limit|Tight budgets ___ what researchers can attempt.
+construct|v|สร้าง|to build or form something|build||Engineers plan to ___ a second causeway.
+consult|v|ปรึกษา|to seek advice or information from someone|confer||Patients should ___ a specialist before deciding.
+consume|v|บริโภค ใช้หมดไป|to use up or eat and drink|use||Data centres ___ enormous amounts of electricity.
+contact|v|ติดต่อ|to communicate with someone|reach||Please ___ the registrar for a replacement copy.
+contemporary|adj|ร่วมสมัย, ในยุคเดียวกัน|belonging to the present or the same period|modern||The museum focuses on ___ Southeast Asian art.
+context|n|บริบท|the setting that helps explain something|setting||The remark makes sense only in its historical ___.
+contract|n/v|สัญญา/หดตัว|a formal written agreement|agreement||The ___ runs for an initial period of two years.
+contradict|v|ขัดแย้งกับ แย้ง|to state the opposite of|oppose|against|The latest findings ___ earlier claims about the vaccine.
+contrary|adj|ที่ตรงกันข้าม|opposite in nature or direction|opposite||___ to popular belief, the practice is quite recent.
+contrast|v|เปรียบเทียบให้เห็นความต่าง|to compare in order to show differences|differentiate||The essay will ___ rural and urban attitudes to marriage.
+contribute|v|สนับสนุน/ช่วยเหลือ|to give something towards a shared purpose|donate||Local businesses ___ about a third of the budget.
+controversial|adj|เป็นที่ถกเถียง|causing public disagreement|disputed||The minister's ___ remarks drew criticism from both parties.
+controversy|n|ข้อโต้เถียง|prolonged public disagreement|dispute||The ruling sparked ___ among legal scholars.
+convene|v|เรียกประชุม|to bring people together for a meeting|assemble||The board will ___ again in October.
+convention|n|ธรรมเนียมปฏิบัติ|an accepted way of behaving, or a large meeting|custom||It is a ___ in academic writing to avoid slang.
+converse|v|สนทนา|to talk with someone|chat||Delegates were able to ___ freely during the break.
+convert|v|แปลงเปลี่ยนสภาพ|to change from one form or use to another|transform|change|Plants ___ sunlight into chemical energy.
+convey|v|ถ่ายทอด สื่อความหมาย|to communicate an idea, or to carry something|communicate||Graphs ___ trends more clearly than tables of numbers.
+convince|v|ทำให้เชื่อ โน้มน้าว|to make someone believe something|persuade||The evidence failed to ___ the jury.
+cooperate|v|ร่วมมือ|to work together toward a shared aim|collaborate||Both agencies agreed to ___ on the census.
+coordinate|v|ประสานงาน|to organise different parts so they work together|organise||A single office will ___ the relief effort.
+core|n/adj|แกนกลาง|the central and most important part|centre||Reading speed lies at the ___ of the whole exam.
+corporate|adj|เกี่ยวกับบริษัท|relating to a large company|commercial||___ donations now fund much of the research.
+correlate|v|มีความสัมพันธ์กัน|to have a mutual relationship with something|relate||Income and life expectancy ___ strongly across provinces.
+correspond|v|สอดคล้องตรงกัน|to match or be equivalent to|match||The symptoms ___ closely to those described in the literature.
+couple|n/v|คู่/รวมกัน|two things considered together|pair||The report links the two problems as a ___.
+create|v|สร้าง|to bring something into existence|produce||The scheme should ___ several thousand jobs.
+credit|n/v|ความเชื่อถือ|public recognition, or a sum lent by a bank|recognition||She received little ___ for the discovery.
+criteria|n|เกณฑ์ที่ใช้ตัดสิน|standards used for judging something|standards||Applicants must meet all four ___ for the scholarship.
+crucial|adj|สำคัญอย่างยิ่ง ชี้ขาด|extremely important|vital|key|Early diagnosis is ___ to successful treatment.
+crust|n|เปลือกโลก ชั้นนอกสุด|the hard outer layer of the earth|outer shell||The oceanic ___ is thinner than the continental one.
+cultivate|v|เพาะปลูก, บ่มเพาะ|to grow crops, or to develop a quality|foster||Schools should ___ curiosity as much as discipline.
+culture|n|วัฒนธรรม|the customs and beliefs of a society|society||Office ___ varies enormously between the two firms.
+cumulative|adj|ที่สะสมเพิ่มพูนขึ้น|increasing by successive additions|accumulated||The ___ effect of small savings can be substantial over decades.
+currency|n|สกุลเงิน|the money used in a particular country|money||A weaker ___ makes exports more competitive.
+curriculum|n|หลักสูตร|the subjects taught in a school or course|syllabus||The new ___ places more weight on writing.
+cycle|n/v|วงจร|a series of events that repeat regularly|loop||The monsoon ___ governs the planting calendar.
+data|n|ข้อมูล|facts and figures collected for analysis|information||The ___ suggest a slow but steady improvement.
+debate|n/v|อภิปราย|a formal discussion of opposing views|discussion||The ___ over nuclear power continues.
+decade|n|ทศวรรษ|a period of ten years|ten years||Rents have doubled in barely a ___.
+decisive|adj|ที่ชี้ขาด, เด็ดขาดกล้าตัดสินใจ|settling an issue, or acting with firmness|conclusive||Air power proved ___ in the final campaign.
+decline|v|ลดลง, ปฏิเสธ|to decrease, or to politely refuse|decrease|reduce|Bird populations ___ sharply where forests are cleared.
+deduce|v|อนุมาน สรุปจากหลักฐาน|to reach a conclusion by reasoning|infer|guess|From the wear marks we can ___ how the tool was held.
+deficiency|n|การขาดแคลน ภาวะพร่อง|a lack or shortage|shortage||Iron ___ is a leading cause of anaemia among children.
+deficient|adj|ที่ขาดแคลนไม่เพียงพอ|lacking something necessary|lacking||The diet is ___ in iodine and iron.
+define|v|นิยาม|to state the exact meaning of something|specify||The paper never quite ___s what it means by poverty.
+definite|adj|แน่นอน|clear and certain, with no doubt|certain||We still have no ___ date for the launch.
+deliberate|adj|ที่จงใจ ตั้งใจทำ|done on purpose|intentional||Investigators concluded that the fire was a ___ act.
+delta|n|ดินดอนสามเหลี่ยมปากแม่น้ำ|a triangular area of land at a river's mouth|river mouth||The ___ is sinking faster than the sea is rising.
+democracy|n|ประชาธิปไตย|government by the people through elected representatives|popular rule||The transition to ___ took almost a decade.
+demonstrate|v|สาธิต/ประท้วง|to show clearly by example or evidence|show|show|The results ___ a clear link between the two.
+denote|v|บ่งบอก หมายถึง|to be a sign of or indicate|indicate||A dotted line is used to ___ an uncertain boundary.
+dense|adj|หนาแน่น แน่นทึบ|closely packed together|thick||___ fog closed the airport for six hours.
+density|n|ความหนาแน่น|the amount of mass in a given volume|compactness||Ice floats because its ___ is lower than water's.
+deny|v|ปฏิเสธ|to state that something is not true|refute|against|Officials continue to ___ any knowledge of the payments.
+depict|v|บรรยาย วาดให้เห็นภาพ|to represent or describe something|portray||Early maps ___ the region as an empty wilderness.
+deplete|v|ทำให้ร่อยหรอ ใช้จนหมด|to use up a supply of something|exhaust||Intensive farming can ___ the soil of nutrients.
+depress|v|ทำให้หดหู่, ทำให้ตกต่ำ|to lower activity or spirits|dampen||Higher tariffs would ___ demand for imported cars.
+derive|v|ได้มาจาก มีที่มาจาก|to obtain something from a source|obtain||Most of the country's income is ___d from tourism.
+design|n/v|ออกแบบ|to plan the form and function of something|plan||Architects will ___ the building to withstand flooding.
+despite|prep|ทั้งๆ ที่|without being affected by something|in spite of||The match went ahead ___ the heavy rain.
+detect|v|ตรวจจับ ตรวจพบ|to discover the presence of something|discover||The sensors can ___ movement at fifty metres.
+deteriorate|v|เสื่อมโทรมลง|to become worse|worsen|worse|Air quality continues to ___ during the burning season.
+detrimental|adj|ที่ก่อผลเสีย เป็นอันตราย|causing harm or damage|harmful|harm|Long hours of screen time can be ___ to children's sleep.
+deviate|v|เบี่ยงเบนออกจาก|to depart from an established course|diverge|change|Pilots must not ___ from the approved flight path.
+device|n|อุปกรณ์|an object made for a particular purpose|gadget||A small ___ measures humidity inside the vault.
+devote|v|อุทิศ|to give time or effort entirely to something|dedicate||She chose to ___ her career to marine research.
+differentiate|v|แยกแยะความแตกต่าง|to recognise what makes things different|distinguish|separate|Young children cannot yet ___ between the two sounds.
+digestion|n|การย่อยอาหาร|the process of breaking down food in the body|absorption||Fibre slows ___ and steadies blood sugar.
+dimension|n|มิติ|a measurement, or an aspect of a situation|measurement||The crisis has an important political ___.
+diminish|v|ลดน้อยถอยลง|to become or make less|decrease|reduce|Interest in the project began to ___ after funding was cut.
+discourse|n|วาทกรรม การอภิปราย|serious written or spoken discussion|discussion||Public ___ on the issue has become polarised.
+discrepancy|n|ความไม่ตรงกัน ข้อแตกต่าง|a difference between things that should match|inconsistency||Auditors found a ___ between the invoices and the bank records.
+discrete|adj|ที่แยกจากกันชัดเจน|separate and distinct|separate|separate|The process falls into three ___ stages.
+discriminate|v|แยกแยะ/เหยียด|to tell things apart, or to treat unfairly|distinguish|separate|Employers may not ___ on grounds of age.
+displace|v|ทำให้ต้องย้ายที่|to force something or someone out of place|dislodge||The dam will ___ some eight thousand villagers.
+display|n/v|แสดง|to show something publicly|show|show|The museum will ___ the manuscripts for one month.
+dispose|v|กำจัดทิ้ง|to get rid of something|discard||Hospitals must ___ of waste under strict rules.
+distinction|n|ความแตกต่าง|a clear difference between two things|difference||The ___ between weather and climate matters here.
+distort|v|บิดเบือน|to change something so it is no longer accurate|misrepresent||Small samples can badly ___ the results.
+distribute|v|แจกจ่าย|to give out or spread over an area|hand out|give|Aid agencies will ___ rice to the worst-hit villages.
+diverse|adj|หลากหลาย แตกต่างกันไป|showing a great deal of variety|varied||Bangkok's population is far more ___ than official figures suggest.
+diversity|n|ความหลากหลาย|the state of having many different kinds|variety||Logging has reduced the ___ of the forest canopy.
+document|n/v|เอกสาร|an official written record|record||Every ___ must be signed by two witnesses.
+domain|n|ขอบเขต|an area of activity or knowledge|field||Ethics lies outside the ___ of statistics.
+domestic|adj|ภายในประเทศ|relating to the home or to one's own country|internal||___ demand has grown faster than exports.
+dominant|adj|ที่มีอิทธิพลเหนือกว่า|most powerful or most common|leading||Mangroves are the ___ vegetation along the estuary.
+dominate|v|ครอบงำ มีอิทธิพลเหนือ|to have controlling influence over|control||Two firms ___ the domestic cement market.
+dormant|adj|ที่สงบนิ่งรอเวลา ไม่ออกฤทธิ์|temporarily inactive but able to revive|inactive||The volcano has been ___ for four centuries.
+draft|n/v|ร่าง|a first version of a piece of writing|outline||Please return comments on the first ___ by Friday.
+drama|n|ละคร|a play, or an exciting series of events|play||Greek ___ remains central to the course.
+drastic|adj|ที่รุนแรงฉับพลัน|extreme and sudden in effect|severe||___ cuts to the budget would close three clinics.
+durable|adj|ทนทาน ใช้ได้นาน|able to withstand wear over a long time|hard-wearing||Teak is prized for being exceptionally ___.
+duration|n|ระยะเวลา|the length of time something lasts|length||Rainfall was heavy, but of short ___.
+dynamic|adj/n|พลวัต|constantly changing or full of energy|changing||The city has a remarkably ___ street economy.
+earthquake|n|แผ่นดินไหว|a sudden violent shaking of the ground|tremor||The ___ was felt three hundred kilometres away.
+economy|n|เศรษฐกิจ|the system of production and trade in a country|market||The ___ grew by less than two percent.
+ecosystem|n|ระบบนิเวศ|a community of organisms and their environment|biome||The mangrove ___ shelters young fish from the open sea.
+edit|v|แก้ไข|to correct and prepare text for publication|revise||Two specialists will ___ the final manuscript.
+efficient|adj|ที่ใช้ทรัพยากรอย่างคุ้มค่า|working well without wasting resources|productive||The newer turbines are far more ___ at low wind speeds.
+elaborate|v|ขยายความ อธิบายเพิ่มเติม|to explain in greater detail|expand||The witness refused to ___ on her earlier statement.
+element|n|องค์ประกอบ|a basic part of something|component||Trust is an essential ___ of good governance.
+eliminate|v|กำจัดให้หมดสิ้น|to remove completely|remove||The programme aims to ___ malaria by 2030.
+emerge|v|ปรากฏขึ้น โผล่ออกมา|to appear or become known|appear||New evidence may ___ during the trial.
+eminent|adj|มีชื่อเสียงโดดเด่นในวงการ|famous and respected within a field|distinguished||The lecture was given by an ___ economist from Kyoto.
+emphasis|n|การเน้นย้ำ|special importance given to something|stress||The course places heavy ___ on fieldwork.
+empirical|adj|ที่อาศัยการสังเกตทดลอง|based on observation rather than theory|observed||The claim has little ___ support.
+enable|v|ทำให้สามารถ|to make something possible|allow|allow|Subsidies ___ small farms to survive poor years.
+encounter|v|พบเจอโดยไม่คาดคิด|to meet or experience unexpectedly|meet||Travellers may ___ delays at the border.
+endeavor|n|ความพยายามอย่างจริงจัง|a serious and determined effort|effort||Mapping the seabed is a costly ___.
+energy|n|พลังงาน|the power needed for activity or work|power||Wind now supplies a fifth of the country's ___.
+enforce|v|บังคับใช้กฎหมาย|to make people obey a rule|impose|force|Local officials rarely ___ the parking regulations.
+enhance|v|ยกระดับ เพิ่มคุณค่า|to improve the quality of something|improve||Subtitles can ___ comprehension for second-language learners.
+enormous|adj|มหาศาล ใหญ่โตมาก|extremely large|immense|big|Restoring the wetlands would require ___ investment.
+ensure|v|ทำให้มั่นใจว่าจะเกิด|to make certain that something happens|guarantee|sure|Checks are needed to ___ that funds reach the poorest.
+entity|n|ตัวตน|a thing with its own separate existence|body||The subsidiary is a legal ___ in its own right.
+environment|n|สิ่งแวดล้อม|the surroundings in which something exists|surroundings||Mining has damaged the marine ___ badly.
+equate|v|ทำให้เท่ากับ|to treat two things as equal or equivalent|liken||It is wrong to ___ wealth with wellbeing.
+equip|v|จัดหาให้|to supply with what is needed|furnish||The course should ___ students for postgraduate work.
+equivalent|adj|ที่มีค่าเท่ากัน|equal in value, meaning or effect|equal|same|One unit is ___ to about four grams of sugar.
+era|n|ยุคสมัย|a long distinct period of history|age||The discovery opened a new ___ in medicine.
+erosion|n|การกัดเซาะพังทลาย|the gradual wearing away of land by water or wind|wearing away||Coastal ___ has claimed two metres of beach a year.
+error|n|ข้อผิดพลาด|a mistake|mistake||A single ___ in the code delayed the launch.
+essential|adj|ที่จำเป็นอย่างยิ่ง ขาดไม่ได้|absolutely necessary|vital|key|Clean water is ___ to controlling the outbreak.
+establish|v|ก่อตั้ง|to set up or prove something firmly|found||The trust was ___ed in 1954.
+estate|n|ทรัพย์สิน|property, especially a large area of land|property||The family sold the ___ to a conservation trust.
+estimate|v/n|ประมาณการ|to judge an amount approximately|gauge||Analysts ___ the loss at four billion baht.
+ethic|n|จริยธรรม|a moral principle guiding behaviour|moral||A strong work ___ is valued in the profession.
+ethics|n|จริยศาสตร์ หลักจริยธรรม|moral principles governing conduct|morals||Research ___ require consent from every participant.
+ethnic|adj|ชาติพันธุ์|relating to a group with a shared cultural origin|cultural||The province is home to seven ___ minorities.
+evaluate|v|ประเมิน|to judge the value or quality of something|appraise|check|Inspectors will ___ the programme after one year.
+evaporation|n|การระเหย|the change of liquid into vapour|vaporisation||___ from the reservoir rises steeply in April.
+eventual|adj|ในที่สุด|happening at the end of a process|final||The ___ cost was three times the estimate.
+evident|adj|ที่ประจักษ์ชัด|plain and obvious|obvious|clear|The strain on the health system is now ___.
+evolution|n|วิวัฒนาการ|gradual development over time|development||The ___ of the alphabet took many centuries.
+exacerbate|v|ทำให้เลวร้ายลงกว่าเดิม|to make a bad situation worse|aggravate|worse|Cutting the budget would only ___ the shortage of nurses.
+exaggerate|v|พูดเกินจริง|to represent something as larger than it is|overstate||Early reports greatly ___d the death toll.
+exceed|v|เกินกว่า มากเกินกำหนด|to be greater than|surpass||Costs are expected to ___ the original estimate by 20 percent.
+excessive|adj|ที่มากเกินพอดี|greater than is necessary or proper|immoderate||___ fertiliser use has polluted the groundwater.
+exclude|v|กีดกันออกไป ไม่รวม|to keep out or leave out|omit||The survey chose to ___ households without phones.
+exemplify|v|เป็นตัวอย่างอันดีของ|to be a typical example of|illustrate||These ruins ___ the architecture of the late Ayutthaya period.
+exhibit|v|แสดงให้เห็น จัดแสดง|to show or display publicly|display|show|Patients may ___ symptoms for several weeks.
+exotic|adj|ที่มาจากต่างถิ่น แปลกตา|from a distant country and strikingly unusual|foreign||The garden is planted with ___ palms from Madagascar.
+expand|v|ขยายตัว แผ่กว้าง|to become larger in size or scope|enlarge||The company plans to ___ into neighbouring markets.
+expert|n|ผู้เชี่ยวชาญ|a person with great knowledge or skill|specialist||An ___ in soil chemistry advised the team.
+explicit|adj|ที่ชัดเจนตรงไปตรงมา|stated clearly and in detail|clear|clear|The contract contains an ___ ban on subcontracting.
+exploit|v|ใช้ประโยชน์, เอารัดเอาเปรียบ|to use fully, often unfairly|utilise||Colonial powers moved quickly to ___ the region's tin.
+export|v|ส่งออก|to send goods to another country for sale|ship out||Thailand continues to ___ large volumes of rice.
+expose|v|เปิดเผย, ทำให้เผชิญกับ|to reveal, or to leave unprotected|reveal||The leak ___d serious flaws in the security system.
+extensive|adj|ที่กว้างขวางครอบคลุม|covering a large area or range|wide-ranging||The fire caused ___ damage to the archive.
+external|adj|ภายนอก|coming from or existing on the outside|outer||The building withstood severe ___ pressure.
+extract|v|สกัด|to remove or take out, often with effort|draw out||Machines ___ oil from the crushed seeds.
+facilitate|v|ทำให้ง่ายขึ้น เอื้ออำนวย|to make a process easier|ease|allow|Better roads would ___ trade between the provinces.
+factor|n|ปัจจัย|one element contributing to a result|element||Cost was the deciding ___ in the choice.
+fauna|n|สัตว์ประจำถิ่น|the animals of a particular region|animal life||Cave ___ is adapted to permanent darkness.
+feasible|adj|เป็นไปได้ในทางปฏิบัติ|possible to do easily or conveniently|practicable|possible|Solar power is now a ___ option for remote villages.
+feature|n|ลักษณะเฉพาะ|a distinctive attribute of something|characteristic||The main ___ of the region is its limestone.
+federal|adj|รัฐบาลกลาง|relating to a central government of united states|national||The dispute moved to a ___ court.
+fee|n|ค่าธรรมเนียม|a payment for a service or right|charge||The entrance ___ was waived for students.
+file|n|ไฟล์/แฟ้ม|a folder or collection of records|record||Each patient ___ is kept for ten years.
+final|adj|สุดท้าย|coming at the end; last|last||The ___ chapter summarises the argument.
+finance|n|การเงิน|the management of large sums of money|funding||Public ___ has been strained by the subsidies.
+finite|adj|ที่มีขีดจำกัด|having limits and not endless|limited||Fossil fuels are a ___ resource.
+flexible|adj|ยืดหยุ่น ปรับเปลี่ยนได้|able to change to suit conditions|adaptable||Staff were offered more ___ working hours.
+flora|n|พรรณพืชประจำถิ่น|the plants of a particular region|plant life||The island's ___ includes sixty endemic orchids.
+fluctuate|v|ผันผวน ขึ้นๆ ลงๆ|to rise and fall irregularly|vary|change|Oil prices ___ sharply in response to political news.
+focus|n/v|จุดสนใจ|the centre of interest or attention|centre||The ___ of the study is coastal erosion.
+forecast|v|พยากรณ์ล่วงหน้า|to predict future conditions from data|predict|guess|Meteorologists ___ heavier rain than usual this season.
+format|n|รูปแบบ|the way something is arranged or presented|layout||The exam ___ changed in 2019.
+formula|n|สูตร|a rule or method expressed in symbols|equation||There is no simple ___ for economic growth.
+formulate|v|คิดค้นและเรียบเรียงขึ้น|to create and express in a systematic way|devise||It took years to ___ a workable policy.
+forthcoming|adj|ที่กำลังจะมาถึง|about to happen or appear|upcoming||Details will be released in a ___ report.
+fossil|n|ซากดึกดำบรรพ์|the preserved remains of an ancient organism|petrified remain||The ___ was embedded in limestone.
+foster|v|บ่มเพาะส่งเสริมให้เติบโต|to encourage the development of something|nurture|support|Small classes ___ closer contact between staff and students.
+foundation|n|พื้นฐาน|the base on which something is built|base||Trust is the ___ of any joint venture.
+fragile|adj|บอบบาง แตกหักเสียหายง่าย|easily broken or damaged|delicate||Coral reefs are among the most ___ ecosystems.
+framework|n|โครงร่าง|a supporting structure of ideas or rules|structure||The paper offers a ___ for comparing the two systems.
+function|n|หน้าที่|the purpose or role of something|purpose||The main ___ of the valve is to release pressure.
+fundamental|adj|ที่เป็นพื้นฐานสำคัญ|forming a necessary base|basic|key|Free speech is a ___ principle of democratic society.
+furthermore|adv|นอกจากนี้|in addition to what has been said|moreover||The plan is costly; ___, it is unlikely to work.
+galaxy|n|ดาราจักร กาแล็กซี|a huge system of stars held together by gravity|star system||Our ___ contains several hundred billion stars.
+generate|v|สร้าง|to produce or bring into being|produce||The dam will ___ power for two provinces.
+generation|n|รุ่น|all the people born at about the same time|age group||This ___ faces far higher housing costs.
+genuine|adj|ที่แท้จริง ไม่ปลอม|real and authentic|authentic||The manuscript was later shown to be ___.
+glacier|n|ธารน้ำแข็ง|a slow-moving mass of ice|ice river||The ___ has retreated nearly a kilometre since 1980.
+globe|n|โลก|the earth as a whole|world||News of the eruption travelled across the ___.
+goal|n|เป้าหมาย|an aim or desired result|aim||The ___ is to halve waste within five years.
+grade|n|เกรด/ระดับ|a level of quality or achievement|rank||Only the highest ___ of timber is exported.
+grant|v|มอบให้ อนุญาต|to give or allow formally|award|give|The court may ___ an extension of thirty days.
+gravity|n|แรงโน้มถ่วง|the force attracting objects toward each other|attraction||The moon's ___ is about one sixth of the earth's.
+guarantee|v|รับประกัน|to promise that something will happen|assure|sure|Higher pay alone will not ___ better teaching.
+guideline|n|แนวทาง|a general rule or piece of advice|recommendation||New ___s on screen time were issued last week.
+habitat|n|ถิ่นที่อยู่อาศัยตามธรรมชาติ|the natural home of an animal or plant|home||Draining the marsh destroyed the birds' only ___.
+halt|v|หยุดชะงัก ยุติการเคลื่อนไหว|to stop moving or operating|stop|stop|Flooding forced the railway to ___ all services.
+harness|v|นำมาใช้ให้เกิดประโยชน์|to control a natural force and put it to use|exploit||Engineers hope to ___ tidal energy along the coast.
+hazardous|adj|ที่เสี่ยงอันตราย|involving risk of harm|dangerous||Workers handling ___ waste wear sealed suits.
+hence|adv|ดังนั้น|for this reason; from now|therefore||Costs rose sharply and ___ the project stalled.
+heritage|n|มรดกทางวัฒนธรรม|traditions and buildings inherited from the past|legacy||The old town was granted world ___ status.
+hierarchy|n|ลำดับชั้น โครงสร้างอำนาจ|a system ranking people or things by status|ranking||Promotion depends on your place in the ___.
+highlight|v|เน้นย้ำให้เด่นชัด|to draw attention to something|emphasise||The study ___s the risks of early screen use.
+hinder|v|ขัดขวาง หน่วงเหนี่ยว|to make something difficult|impede||Heavy rain continued to ___ the rescue operation.
+humid|adj|ที่มีความชื้นสูง|having a high level of moisture in the air|muggy||The ___ air makes the heat far harder to bear.
+hypothesis|n|สมมติฐาน|a proposed explanation to be tested|theory||The experiment was designed to test a single ___.
+hypothesize|v|ตั้งสมมติฐาน|to propose an explanation for testing|theorise||Early astronomers ___d that comets were atmospheric.
+identical|adj|ที่เหมือนกันทุกประการ|exactly the same|indistinguishable|same|The two samples proved chemically ___.
+identify|v|ระบุ|to recognise or establish what something is|recognise||Biologists could not ___ the species from the photograph.
+ideology|n|อุดมการณ์|a system of political or social beliefs|doctrine||The party abandoned its founding ___ in the 1990s.
+ignorance|n|ความไม่รู้|lack of knowledge or awareness|unawareness||Much of the fear stems from simple ___.
+illuminate|v|ส่องสว่าง, ทำให้เข้าใจแจ่มแจ้ง|to light up, or to make something clear|clarify|clear|These letters ___ the poet's final years.
+illustrate|v|แสดงให้เห็นด้วยตัวอย่าง|to make clear by giving examples|demonstrate|show|These figures ___ how uneven the recovery has been.
+image|n|รูปภาพ/ภาพพจน์|a picture, or the impression people have of something|picture||The satellite ___ shows the extent of the burn.
+immigrate|v|อพยพเข้า|to come to live permanently in a foreign country|migrate||Thousands ___ each year in search of work.
+imminent|adj|ที่ใกล้จะเกิดขึ้นในไม่ช้า|about to happen very soon|impending||Residents were warned of an ___ flood.
+impact|n|ผลกระทบ|a strong effect on something|effect||The drought had a severe ___ on rural incomes.
+implement|v|นำไปปฏิบัติจริง|to put a plan into action|execute||The school will ___ the new curriculum next term.
+implicate|v|พัวพัน, บ่งชี้ว่าเกี่ยวข้อง|to show that someone is involved in wrongdoing|incriminate||The documents ___ two senior officials.
+implication|n|นัยยะ ผลที่ตามมา|a likely consequence of an action|consequence||Few researchers grasped the full ___ of the discovery.
+implicit|adj|ที่เป็นนัย ไม่ได้กล่าวตรงๆ|suggested rather than directly stated|implied|hidden|There was an ___ promise of future funding.
+imply|v|บอกเป็นนัย|to suggest something without saying it|suggest||The wording seems to ___ that consent was given.
+impose|v|บังคับใช้ กำหนดให้ต้อง|to force something on someone|inflict|force|The government may ___ a curfew in the border districts.
+inadequate|adj|ที่ไม่เพียงพอ ไม่ได้มาตรฐาน|not enough or not good enough|insufficient|enough|Housing for seasonal workers remains ___.
+incentive|n|สิ่งจูงใจ แรงกระตุ้น|something that motivates action|motivation||Tax breaks serve as an ___ for companies to invest.
+incidence|n|อัตราการเกิดขึ้น|the rate at which something occurs|rate||The ___ of diabetes has doubled since 1990.
+inclination|n|ความโน้มเอียงที่จะ|a natural tendency to do something|tendency||He showed no ___ to defend the decision.
+income|n|รายได้|money received from work or investment|earnings||Average household ___ has stagnated since 2015.
+incorporate|v|รวมเข้าด้วยกัน|to include something as part of a whole|include|combine|The design will ___ traditional roof forms.
+incredible|adj|เหลือเชื่อ น่าทึ่ง|too strange to be believed, or extraordinary|unbelievable||The survey revealed an ___ variety of insect life.
+index|n|ดัชนี|an alphabetical list, or a measure of change|indicator||The price ___ rose for the fourth month running.
+indicate|v|ระบุ/ชี้ให้เห็น|to point out or be a sign of something|signal|show|Falling water levels ___ a longer dry season ahead.
+indispensable|adj|ที่ขาดเสียมิได้|absolutely necessary|essential|key|A reliable dictionary is ___ for serious translation work.
+individual|n|รายบุคคล|a single person considered separately|person||Each ___ must give informed consent.
+induce|v|ชักนำให้เกิด|to cause something to happen|cause|force|Certain drugs can ___ drowsiness.
+inevitable|adj|ที่หลีกเลี่ยงไม่ได้|certain to happen|unavoidable||Some delay was ___ given the scale of the project.
+infer|v|อนุมานจากข้อมูล|to work something out from evidence|conclude|guess|We can ___ the temperature from the width of the rings.
+inflation|n|ภาวะเงินเฟ้อ|a general rise in prices and fall in money's value|price rise||___ ate into the value of fixed pensions.
+infrastructure|n|โครงสร้างพื้นฐาน|the basic physical systems a country needs|facilities||Poor ___ holds back growth in the north.
+inherent|adj|ที่มีอยู่ในตัวโดยธรรมชาติ|existing as a natural part of something|intrinsic||Risk is ___ in any form of investment.
+inhibit|v|ยับยั้ง ขัดขวางการเติบโต|to prevent or slow down a process|hinder|limit|Cold weather will ___ the growth of the seedlings.
+initial|adj|เริ่มแรก|occurring at the beginning|first|before|The ___ results were more promising than the final ones.
+initiate|v|ริเริ่ม เริ่มดำเนินการ|to start a process or plan|launch|start|The council voted to ___ a review of the bylaws.
+injure|v|ทำให้บาดเจ็บ|to cause physical harm to someone|wound||Falling debris may ___ workers below.
+innate|adj|ที่ติดตัวมาแต่กำเนิด|present from birth rather than learned|inborn||Infants show an ___ preference for human faces.
+innovate|v|คิดค้นสิ่งใหม่|to introduce new methods or ideas|pioneer||Small firms often ___ faster than large ones.
+innovation|n|นวัตกรรม|a new method, idea or product|invention||The ___ cut production costs by a third.
+innovative|adj|ที่คิดค้นขึ้นใหม่|using new methods or ideas|inventive||The clinic won an award for its ___ outreach programme.
+input|n|ข้อมูลนำเข้า|what is put into a system to make it work|contribution||The model depends heavily on the quality of its ___.
+insight|n|ความเข้าใจอย่างลึกซึ้ง|a deep and accurate understanding|understanding||The diaries offer rare ___ into life at the court.
+inspect|v|ตรวจตราอย่างเป็นทางการ|to examine officially|examine|check|Engineers ___ the bridge supports twice a year.
+instance|n|ตัวอย่าง|a particular example or case|example||In this ___, the older method proved better.
+institute|n|สถาบัน|an organisation for research or education|academy||The ___ trains about two hundred nurses a year.
+instruct|v|สอน/สั่ง|to teach, or to give an order|direct||The court may ___ the agency to release the files.
+instrument|n|เครื่องมือ|a tool used for precise work, or a means to an end|tool||Taxation is a blunt ___ for changing behaviour.
+integral|adj|ที่เป็นส่วนสำคัญขาดไม่ได้|necessary to make something complete|essential|key|Fieldwork is an ___ part of the degree.
+integrate|v|ผสานรวมเข้าด้วยกัน|to combine parts into a whole|combine|combine|The app can ___ data from several sources.
+integrity|n|ความซื่อสัตย์, ความสมบูรณ์|honesty, or the state of being whole|honesty||The scandal called the institute's ___ into question.
+intelligence|n|สติปัญญา|the ability to learn and reason|intellect||The test measures only a narrow kind of ___.
+intense|adj|เข้มข้น รุนแรง|very great in strength or degree|extreme||The reform followed a period of ___ public pressure.
+interact|v|มีปฏิสัมพันธ์|to act on or communicate with each other|engage||The two drugs may ___ dangerously.
+intermediate|adj|ปานกลาง|coming between two stages or levels|middle||The course suits ___ learners of English.
+internal|adj|ภายใน|existing or occurring inside something|inner||An ___ review found several accounting errors.
+interpret|v|ตีความ|to explain the meaning of something|construe||Judges must ___ the wording of the statute.
+interval|n|ช่วงเวลา|a period of time between two events|gap||Readings are taken at ten-minute ___s.
+intervene|v|เข้าแทรกแซง|to become involved in order to change an outcome|intercede||The central bank chose not to ___ in the currency market.
+intricate|adj|ซับซ้อนละเอียดลออ|very complicated or detailed|complex||The temple doors are covered with ___ carvings.
+intrinsic|adj|ที่มีอยู่ในตัวเอง|belonging naturally to something|inherent||Curiosity has ___ value quite apart from its uses.
+invaluable|adj|ที่มีค่ามหาศาลจนประเมินไม่ได้|extremely useful beyond measure|priceless||Local guides proved ___ during the survey.
+invest|v|ลงทุน|to put money into something to gain a return|fund||Pension funds ___ heavily in government bonds.
+investigate|v|สืบสวน|to examine a matter systematically|probe|check|Police will ___ the cause of the collapse.
+invisible|adj|ที่มองไม่เห็นด้วยตาเปล่า|unable to be seen|unseen||Most of the damage is ___ from the surface.
+invoke|v|อ้างถึง เรียกใช้อำนาจ|to appeal to a law or authority as justification|cite||Ministers may ___ emergency powers during a flood.
+involve|v|เกี่ยวข้อง|to include as a necessary part|entail||The job will ___ frequent travel to the provinces.
+isolate|v|แยกให้อยู่โดดเดี่ยว|to separate something from others|separate|separate|Researchers managed to ___ the active compound.
+isolated|adj|ที่อยู่ห่างไกลโดดเดี่ยว|far from other places or people|remote||The ___ villages are reachable only by boat.
+issue|n|ประเด็น/ปัญหา|an important topic or problem|matter||Water rights remain the central ___.
+item|n|รายการ/ชิ้น|a single article or unit in a list|article||Each ___ on the questionnaire was tested twice.
+jeopardize|v|ทำให้ตกอยู่ในความเสี่ยง|to put something at risk|endanger||Missing the deadline could ___ the entire agreement.
+job|n|งาน|a paid position of employment|post||Automation may cost thousands of factory ___s.
+journal|n|วารสาร|a periodical containing scholarly articles|periodical||The findings appeared in a leading medical ___.
+justify|v|แสดงเหตุผลสนับสนุน|to show that something is reasonable|defend||The results do not ___ such a costly programme.
+keen|adj|กระตือรือร้น, เฉียบคม|eager, or sharp and perceptive|eager||She has a ___ eye for statistical error.
+kernel|n|แก่นแท้, ส่วนสำคัญที่สุด|the central or most important part of something|core||That objection is the ___ of the whole argument.
+keynote|n|ใจความสำคัญ, ปาฐกถาหลัก|the central theme of a speech or event|theme||Her ___ address opened the conference.
+kindle|v|จุดไฟ, กระตุ้น (อารมณ์/ความสนใจ)|to light a fire, or to arouse a feeling|ignite||The exhibition may ___ an interest in local history.
+kinetic|adj|เกี่ยวกับการเคลื่อนที่, พลศาสตร์|relating to motion|moving||A turbine converts ___ energy into electricity.
+kinship|n|ความเป็นญาติพี่น้อง, ความสัมพันธ์ใกล้ชิด|family relationship or close connection|relatedness||___ ties still shape land ownership in the village.
+kinsman|n|ญาติผู้ชาย, สายโลหิต|a male relative|relative||He was buried beside a distant ___.
+knack|n|ความสามารถพิเศษ, ฝีมือ, พรสวรรค์|a special skill acquired easily|talent||She has a ___ for explaining difficult ideas.
+knowledge|n|ความรู้|information and understanding gained by experience|learning||Our ___ of deep-sea life remains thin.
+knowledgeable|adj|ซึ่งมีความรู้รอบตัว, ซึ่งรอบรู้|having a great deal of information|informed||The guide was remarkably ___ about local birds.
+kudos|n|คำชมเชย, เกียรติยศ, ชื่อเสียง|praise and honour for an achievement|acclaim||The team earned considerable ___ for the rescue.
+label|n|ฉลาก|a small piece of writing identifying something|tag||Every sample carries a numbered ___.
+labour|n|แรงงาน|work, especially physical work, or the workforce|work||Cheap ___ drew factories to the region.
+layer|n|ชั้น|a sheet of material covering a surface|stratum||A thin ___ of ash covered the fields.
+lecture|n|การบรรยาย|a formal talk given to an audience|talk||Attendance at every ___ is compulsory.
+legal|adj|ถูกกฎหมาย|permitted by or relating to the law|lawful||The company sought ___ advice before signing.
+legislate|v|ออกกฎหมาย|to make laws|enact||Parliament may ___ on data protection this session.
+legislation|n|กฎหมายที่บัญญัติขึ้น|laws considered collectively|statutes||New ___ will restrict single-use plastics.
+legitimate|adj|ที่ชอบด้วยกฎหมายและเหตุผล|lawful, or justifiable and reasonable|lawful||Residents raised ___ concerns about the noise.
+lethal|adj|ที่ทำให้ถึงแก่ชีวิต|capable of causing death|deadly||The venom is ___ without prompt treatment.
+levy|v|เรียกเก็บภาษี|to impose a tax or charge officially|charge||The city plans to ___ a tax on plastic bags.
+liberal|adj|เสรีนิยม|favouring individual freedom and reform|progressive||The paper takes a ___ line on immigration.
+licence|n|ใบอนุญาต|official permission to do or own something|permit||Fishing without a ___ carries a heavy fine.
+likewise|adv|เช่นเดียวกัน|in the same way; similarly|similarly||Sales fell in Europe and, ___, in Japan.
+link|v|เชื่อมโยง|to connect two things|connect||Researchers ___ the illness to contaminated water.
+locate|v|ตั้งอยู่ที่|to find or place something in a position|situate||Surveyors could not ___ the original boundary stone.
+logic|n|ตรรกะ|reasoning conducted according to strict principles|reasoning||The ___ of the argument breaks down at that point.
+lucrative|adj|ที่ทำกำไรงาม|producing a great deal of profit|profitable||Tutoring has become a ___ business in Bangkok.
+lunar|adj|เกี่ยวกับดวงจันทร์|relating to the moon|moon-related||The festival follows the ___ calendar.
+magnitude|n|ขนาด ระดับความรุนแรง|great size or importance|extent||Officials underestimated the ___ of the disaster.
+maintain|v|รักษาไว้|to keep something in good condition or continue it|preserve|keep|Villagers ___ the irrigation channels themselves.
+major|adj|วิชาเอก/สำคัญ|important or serious; greater in size|principal|key|Traffic is a ___ source of urban pollution.
+majority|n|ส่วนใหญ่|the greater number or part|bulk||A clear ___ of respondents opposed the change.
+mammal|n|สัตว์เลี้ยงลูกด้วยนม|a warm-blooded animal that feeds its young on milk|warm-blood||The whale is the largest ___ ever to have lived.
+manifest|adj|ที่ปรากฏชัดแจ้ง|clear and obvious to see|apparent|clear|The benefits of the scheme are not yet ___.
+manipulate|v|บิดเบือน ชักใยควบคุม|to control or influence unfairly|maneuver||Traders were accused of trying to ___ the market.
+mantle|n|ชั้นแมนเทิลของโลก|the layer of the earth between crust and core|middle layer||Heat from the ___ drives the movement of plates.
+manual|adj|คู่มือ/ด้วยมือ|done by hand, or a book of instructions|handbook||The ___ explains how to calibrate the sensor.
+margin|n|ส่วนต่าง, ขอบ|a difference or an edge|edge||The bill passed by a narrow ___.
+marginal|adj|ที่เล็กน้อยแทบไม่มีผล|very small and of little importance|slight||The change produced only a ___ improvement.
+mass|n|มวลสาร|the amount of matter in an object|bulk||The star's ___ determines how it will eventually die.
+massive|adj|ที่ใหญ่โตมโหฬาร|extremely large and heavy|huge|big|A ___ landslide blocked the valley for weeks.
+mature|adj|ที่เติบโตเต็มที่ สุกงอม|fully developed physically or mentally|developed||The industry is now ___ and growing slowly.
+maximise|v|เพิ่มสูงสุด|to make as large or as effective as possible|optimise||Farmers plant early to ___ the growing season.
+mechanism|n|กลไก วิธีการทำงาน|a process or system by which something works|process||Scientists still debate the ___ behind the effect.
+media|n|สื่อ|the main means of mass communication|press||Coverage in the national ___ was intense.
+medical|adj|ทางการแพทย์|relating to the science of medicine|clinical||All staff receive basic ___ training.
+medium|n|สื่อกลาง/ปานกลาง|a means of communication or expression|channel||Radio remains an important ___ in rural areas.
+mental|adj|ทางจิตใจ|relating to the mind|psychological||Long shifts take a ___ as well as physical toll.
+meteor|n|ดาวตก ผีพุ่งไต้|a small body burning up in the atmosphere|shooting star||A bright ___ lit the sky for several seconds.
+method|n|วิธีการ|a systematic way of doing something|procedure||The ___ has been used since the 1970s.
+microbe|n|จุลินทรีย์|a microscopic living organism|germ||Soil ___s break down the fallen leaves.
+migrate|v|อพยพ|to move from one region to another|relocate||Many birds ___ south before the cold sets in.
+migration|n|การย้ายถิ่น|the movement of people or animals to a new area|movement||Annual ___ takes the birds across two continents.
+military|adj|ทางทหาร|relating to armed forces|armed||The ___ budget was cut by six percent.
+mineral|n|แร่ธาตุ|a naturally occurring inorganic substance|ore element||The springs are rich in dissolved ___s.
+minimal|adj|น้อยที่สุดเท่าที่จะเป็นได้|as small as possible|slight||The treatment caused ___ discomfort.
+minimise|v|ลดให้น้อยที่สุด|to reduce something to the smallest possible amount|reduce|reduce|Careful handling will ___ the risk of contamination.
+minimum|n|ขั้นต่ำ|the least possible amount|lowest||Applicants need a ___ of two years' experience.
+ministry|n|กระทรวง|a government department|department||The ___ of education issued new guidance.
+minor|adj|รอง/เล็กน้อย|lesser in importance or seriousness|slight||The report found only ___ irregularities.
+mitigate|v|บรรเทาความรุนแรงลง|to make something less severe|lessen|reduce|Planting mangroves helps ___ coastal erosion.
+mode|n|รูปแบบ|a way in which something happens or is done|manner||Cycling is the fastest ___ of transport downtown.
+modify|v|ปรับแก้ให้เหมาะสม|to make partial changes to something|amend|change|Engineers had to ___ the design twice.
+molecule|n|โมเลกุล|a group of atoms bonded together|compound unit||A water ___ consists of two hydrogen atoms and one oxygen.
+monitor|v|เฝ้าติดตามตรวจสอบ|to observe and check over time|track|check|Satellites ___ deforestation across the region.
+motivate|v|สร้างแรงจูงใจ|to give someone a reason to act|inspire||Small rewards ___ students more than grades do.
+mutation|n|การกลายพันธุ์|a change in the genetic material of a cell|variation||A chance ___ gave the moths their darker colouring.
+mutual|adj|ที่มีต่อกันทั้งสองฝ่าย|felt or done by two parties equally|reciprocal||The agreement rests on ___ trust.
+navigate|v|นำทาง, ฝ่าฟันไปให้ได้|to find a way through something|steer||Small firms struggle to ___ the new regulations.
+nebula|n|เนบิวลา กลุ่มแก๊สในอวกาศ|a cloud of gas and dust in space|space cloud||New stars are forming inside the ___.
+negate|v|ลบล้าง ทำให้เป็นโมฆะ|to cancel out or make ineffective|nullify|against|Higher fuel costs ___ the savings from the new engine.
+negation|n|การปฏิเสธ, การทำให้เป็นนิเสธ|the denial or opposite of something|denial||Silence here is not the ___ of consent.
+negative|adj|เชิงลบ|expressing refusal, or harmful in effect|unfavourable||The tests came back ___ for infection.
+network|n|เครือข่าย|an interconnected group or system|web||The rail ___ links every provincial capital.
+neutral|adj|ที่เป็นกลาง|not supporting either side|impartial||The mediator must remain strictly ___.
+nevertheless|adv|อย่างไรก็ตาม|in spite of what has just been said|nonetheless||The theory is old; it remains, ___, widely taught.
+node|n|โหนด/จุดเชื่อม|a point where lines or paths meet|junction||Each ___ in the network stores a copy of the data.
+normal|adj|ปกติ|conforming to the usual standard|typical||Rainfall was well below ___ this season.
+notable|adj|ที่น่าจับตา ควรกล่าวถึง|worthy of attention|remarkable||The most ___ exception is the island of Phuket.
+notion|n|ความคิด แนวคิด|an idea or belief about something|concept||He rejected the ___ that talent alone guarantees success.
+notwithstanding|prep|ทั้งๆ ที่|in spite of something|despite||___ the delays, the bridge opened on budget.
+nuclear|adj|นิวเคลียร์|relating to the nucleus of an atom|atomic||The country has no ___ power stations.
+nutrient|n|สารอาหาร|a substance that provides nourishment for growth|nourishment||Flooding deposits ___s that renew the soil each year.
+objective|adj|ที่เป็นกลางไม่ใช้อคติ|not influenced by personal feelings|unbiased||Peer review is meant to keep judgements ___.
+obligate|v|ผูกมัด|to require someone to do something legally or morally|oblige||The treaty ___s both parties to disclose test results.
+obscure|adj|ที่คลุมเครือเข้าใจยาก, ไม่เป็นที่รู้จัก|unclear, or little known|vague||The origin of the custom remains ___.
+obsolete|adj|ล้าสมัย เลิกใช้แล้ว|no longer in use|outdated||Fax machines are largely ___ in modern offices.
+obtain|v|ได้มา จัดหามาได้|to get something, often with effort|acquire|get|Permission to excavate is hard to ___.
+obvious|adj|ชัดเจน|easily seen or understood|evident|clear|There is no ___ explanation for the discrepancy.
+occupy|v|ครอบครอง|to fill a space or take control of a place|inhabit||Squatters ___ several floors of the old building.
+occur|v|เกิดขึ้น|to happen or be found|happen||Landslides ___ most often after prolonged rain.
+odd|adj|แปลก, เลขคี่|strange, or not divisible by two|strange||There is something ___ about the timing of the sale.
+offset|v|ชดเชยหักลบกัน|to balance one effect against another|counterbalance||Higher yields may ___ the cost of fertiliser.
+ongoing|adj|ที่กำลังดำเนินอยู่|continuing at the present time|continuing||The investigation is still ___.
+optimal|adj|ที่ดีที่สุดภายใต้เงื่อนไข|best possible under the circumstances|ideal||Twenty degrees is the ___ temperature for storage.
+option|n|ทางเลือก|a thing that may be chosen|choice||Retraining is the only realistic ___ for older workers.
+orbit|n|วงโคจร|the curved path of an object around a star or planet|circuit||The satellite completes one ___ every ninety minutes.
+ore|n|สินแร่|rock containing metal worth extracting|metal rock||Low-grade ___ became profitable as prices rose.
+organism|n|สิ่งมีชีวิต|an individual living thing|creature||A single ___ can contain trillions of cells.
+orient|v|ปรับตัวให้เข้ากับทิศทาง|to align or adapt to a particular direction or situation|position||New staff need time to ___ themselves.
+ornate|adj|ที่ประดับประดาวิจิตร|elaborately decorated|decorated||The ___ ceiling took artisans nine years to finish.
+outcome|n|ผลลัพธ์|the way something turns out|result||The ___ of the trial surprised the researchers.
+outline|v|ร่างเค้าโครง สรุปประเด็นหลัก|to describe the main points without detail|sketch||The chairman will ___ the proposal on Thursday.
+output|n|ผลผลิต|the amount produced by a process|production||Factory ___ has fallen for three quarters.
+overall|adj|โดยรวม|taking everything into account|general||The ___ picture is more encouraging than it appears.
+overlap|v|ทับซ้อนกัน|to cover part of the same area or subject|coincide||The two ministries' duties partly ___.
+overseas|adv|ต่างประเทศ|in or to a foreign country|abroad||Many graduates now look for work ___.
+paradigm|n|กระบวนทัศน์ แบบแผนความคิด|a typical model or pattern of thought|model||Plate tectonics brought a new ___ to geology.
+paradoxical|adj|ที่ขัดแย้งในตัวเองแต่เป็นจริง|seemingly contradictory yet true|contradictory||It is ___ that the wettest province suffers droughts.
+paragraph|n|ย่อหน้า|a distinct section of a piece of writing|passage||The key claim appears in the opening ___.
+parallel|adj|ที่คู่ขนานคล้ายคลึงกัน|similar and occurring at the same time|comparable|same|A ___ decline was recorded in neighbouring provinces.
+parameter|n|พารามิเตอร์|a limit or factor defining a system|variable||Researchers must set the ___s before running the model.
+paramount|adj|สำคัญเหนือสิ่งอื่นใด|more important than anything else|supreme|key|Passenger safety is ___ for any airline.
+parasite|n|ปรสิต|an organism living on another and harming it|freeloader||The ___ weakens the host without killing it outright.
+participate|v|เข้าร่วม|to take part in an activity|join in||Over four hundred schools ___ in the scheme.
+particle|n|อนุภาค|an extremely small piece of matter|speck||Dust ___s scatter light and redden the sunset.
+partner|n|พันธมิตร|a person or organisation working jointly with another|associate||The university is a ___ in the marine project.
+passive|adj|ที่ยอมรับโดยไม่โต้ตอบ|accepting without active response|inactive||Listening is not a purely ___ skill.
+peculiar|adj|ที่แปลกประหลาด, ที่มีเฉพาะถิ่น|strange, or belonging exclusively to|odd||This beetle is ___ to a single mountain range.
+perceive|v|รับรู้ มองเห็นว่าเป็น|to become aware of or regard in a certain way|discern||Voters ___ the two parties as broadly similar.
+percent|n|เปอร์เซ็นต์|one part in every hundred|hundredth||Only twelve ___ of applicants were accepted.
+period|n|ระยะเวลา|a length of time|span||The dry ___ now lasts a month longer than before.
+peripheral|adj|ที่อยู่รอบนอก ไม่ใช่แก่นสาร|of minor importance, or at the outer edge|secondary||Funding was a ___ issue in the debate.
+persist|v|ยังคงอยู่ต่อไป, ยืนกราน|to continue to exist or to keep trying|endure||Inequality will ___ unless schooling improves.
+persistent|adj|ที่ต่อเนื่องไม่หยุด ดื้อดึง|continuing over a long period|continual||A ___ cough should be examined by a doctor.
+perspective|n|มุมมอง|a particular way of viewing something|viewpoint||The book offers a rural ___ on industrialisation.
+phase|n|ระยะ|a distinct stage in a process|stage||The second ___ of construction begins in June.
+phenomenon|n|ปรากฏการณ์|an observable fact or event|occurrence||El Niño is a well-documented climatic ___.
+philosophy|n|ปรัชญา|the study of knowledge, reality and existence|thought||Her ___ of teaching centres on independence.
+photosynthesis|n|การสังเคราะห์แสง|the process by which plants make food from sunlight|carbon fixing||___ slows sharply in water deeper than thirty metres.
+physical|adj|ทางกายภาพ|relating to the body or to material things|bodily||___ evidence at the site was quickly destroyed.
+plankton|n|แพลงก์ตอน|tiny organisms drifting in the sea|drifting life||Whales filter tonnes of ___ from the water daily.
+plateau|n|ที่ราบสูง|an area of fairly level high ground|tableland||The ___ rises abruptly from the coastal plain.
+plausible|adj|น่าเชื่อถือ ฟังขึ้น|seeming reasonable or probable|believable|possible|Her account of the accident sounded entirely ___.
+plus|prep|บวก|with the addition of|and||The fee is two thousand baht ___ tax.
+policy|n|นโยบาย|a course of action adopted by an organisation|strategy||The new ___ takes effect at the start of term.
+portion|n|ส่วน|a part of a whole|share||A large ___ of the budget goes to salaries.
+pose|v|ก่อให้เกิด (ปัญหา), ตั้งท่า|to present a problem or question|present||Rising seas ___ a direct threat to the delta.
+positive|adj|เชิงบวก|showing agreement, or beneficial in effect|favourable||Feedback from the pilot study was broadly ___.
+potent|adj|ที่มีฤทธิ์แรง ทรงพลัง|having great power or effect|powerful||Nationalism remains a ___ political force.
+potential|adj|ที่อาจเป็นไปได้ในอนาคต|capable of developing into something|possible|possible|The site was identified as a ___ source of contamination.
+practitioner|n|ผู้ประกอบวิชาชีพ|a person actively engaged in a profession|professional||Every ___ must renew the licence annually.
+pragmatic|adj|ที่เน้นผลในทางปฏิบัติ|dealing with things practically rather than ideally|practical||The ministry took a ___ view of the deadline.
+precede|v|เกิดขึ้นก่อน นำหน้า|to come before in time or order|predate||A short introduction will ___ the main lecture.
+precipitation|n|หยาดน้ำฟ้า ปริมาณน้ำฝน|water falling as rain, snow or hail|rainfall||Annual ___ exceeds two thousand millimetres here.
+precise|adj|ที่แม่นยำเที่ยงตรง|exact and accurate in detail|exact|exact|We still lack a ___ figure for the loss.
+predator|n|สัตว์ผู้ล่า|an animal that hunts others for food|hunter||Removing the top ___ allowed deer numbers to explode.
+predict|v|ทำนาย|to say what will happen in the future|forecast|guess|Nobody can reliably ___ next year's rainfall.
+predominant|adj|ที่มีมากที่สุด เด่นที่สุด|most common or noticeable|prevailing|common|Rice remains the ___ crop in the region.
+preliminary|adj|ที่เป็นขั้นเบื้องต้น|coming before the main part|initial|before|___ results suggest a modest benefit.
+prepare|v|เตรียมตัว|to make ready in advance|arrange||Students should ___ thoroughly for the oral test.
+preservation|n|การสงวนรักษาไว้|the act of keeping something in good condition|conservation||The dry climate aided the ___ of the wooden beams.
+preserve|v|อนุรักษ์ รักษาไว้ไม่ให้เสื่อม|to keep something in its original condition|conserve|keep|Dry caves ___ organic material for thousands of years.
+presume|v|สันนิษฐานว่า|to suppose something is true without proof|assume|guess|Courts must ___ the accused innocent.
+prevailing|adj|ที่มีอยู่ทั่วไปในขณะนั้น|most common or current at a time|widespread|common|The ___ winds blow from the southwest.
+prevalent|adj|ที่แพร่หลายทั่วไป|widespread in a particular area|widespread|common|Dengue is most ___ during the rainy season.
+previous|adj|ก่อนหน้า|existing or occurring before something else|earlier|before|The ___ owner had never registered the land.
+prey|n|เหยื่อที่ถูกล่า|an animal hunted by another for food|quarry||Owls locate their ___ almost entirely by sound.
+primary|adj|ปฐมภูมิ/สำคัญ|of chief importance, or earliest in order|chief|key|Our ___ concern is the safety of residents.
+principal|adj|หลัก/ครูใหญ่|first in order of importance|main|key|The ___ cause of the fire remains unknown.
+principle|n|หลักการ|a fundamental truth or rule of conduct|tenet||The whole system rests on one simple ___.
+prior|adj|ที่มีมาก่อนหน้า|existing or coming before|previous|before|No ___ experience is required for the course.
+priority|n|ลำดับความสำคัญ|something regarded as more important than others|precedence||Flood defence is now the council's top ___.
+pristine|adj|ที่บริสุทธิ์ยังไม่ถูกแตะต้อง|in original condition and unspoiled|untouched||Few stretches of ___ rainforest remain.
+proceed|v|ดำเนินการต่อไป|to continue or go forward with something|continue||The trial will ___ despite the appeal.
+process|n|กระบวนการ|a series of actions leading to a result|procedure||Approval is a slow bureaucratic ___.
+professional|adj|มืออาชีพ|relating to paid skilled work|expert||She left teaching for a ___ career in law.
+profound|adj|ที่ลึกซึ้งกินใจ มีผลลึกล้ำ|very great, or showing deep insight|deep||The invention had a ___ effect on rural life.
+prohibit|v|ห้าม ไม่อนุญาต|to formally forbid something|forbid||The new law will ___ smoking in all public parks.
+project|n|โครงการ|a planned piece of work with a specific aim|scheme||The ___ ran two years beyond its deadline.
+proliferate|v|เพิ่มจำนวนอย่างรวดเร็ว|to increase rapidly in number|multiply||Online tutoring platforms began to ___ after the pandemic.
+prominent|adj|ที่โดดเด่นเป็นที่รู้จัก|important and well known, or sticking out|leading||A ___ surgeon chaired the inquiry.
+promote|v|ส่งเสริม|to encourage the growth or spread of something|encourage|support|The campaign aims to ___ handwashing in schools.
+prone|adj|มีแนวโน้มจะเป็น เสี่ยงต่อ|likely to suffer from something|liable|weak|Low-lying areas are ___ to flooding.
+proportion|n|สัดส่วน|a part considered in relation to the whole|ratio||A growing ___ of students study abroad.
+prospect|n|ความเป็นไปได้ในอนาคต|the possibility of a future event|likelihood||There is little ___ of an early settlement.
+protocol|n|ระเบียบปฏิบัติ|an official set of rules or procedures|procedure||Staff failed to follow the safety ___.
+psychology|n|จิตวิทยา|the study of the mind and behaviour|mind study||Consumer ___ explains much of the pricing.
+publication|n|การตีพิมพ์|the act of issuing printed material, or the material itself|release||___ of the report was delayed for legal reasons.
+publish|v|ตีพิมพ์|to make written work available to the public|issue||The team hopes to ___ its findings this autumn.
+purchase|v|ซื้อ|to buy something|buy||The museum plans to ___ the collection outright.
+pursue|v|มุ่งติดตาม ไล่ตาม|to follow or work towards something|chase||She chose to ___ a career in public health.
+qualitative|adj|เชิงคุณภาพ|relating to quality rather than numbers|descriptive||The team combined ___ interviews with survey data.
+quote|v|อ้างอิง|to repeat words from a source|cite||Do not ___ the interview without permission.
+radiation|n|รังสี การแผ่รังสี|energy transmitted as waves or particles|rays||Lead shielding blocks most of the ___.
+radical|adj|ที่รุนแรงถึงราก|far-reaching and fundamental|drastic||The plan calls for ___ changes to the tax code.
+random|adj|สุ่ม|made or occurring without a definite pattern|haphazard||Households were chosen by ___ selection.
+range|n|ช่วง|the extent between limits|span||Temperatures cover a wide ___ across the plateau.
+ratio|n|อัตราส่วน|the relation between two amounts|proportion||The student-teacher ___ has worsened since 2018.
+rational|adj|ที่มีเหตุผล|based on reason rather than emotion|reasoned||Panic buying is rarely a ___ response.
+react|v|ตอบสนอง|to respond to something|respond||Markets ___ quickly to any hint of a rate rise.
+recover|v|ฟื้นตัว|to return to a normal state after difficulty|recuperate||Reef systems may take decades to ___.
+refine|v|ขัดเกลาให้ดีขึ้น|to improve by making small changes|polish||Each trial helped ___ the questionnaire.
+reform|v|ปฏิรูป|to change something in order to improve it|overhaul||Ministers plan to ___ the pension system.
+refute|v|หักล้าง พิสูจน์ว่าผิด|to prove a statement wrong|disprove|against|The team published data to ___ the earlier claim.
+region|n|ภูมิภาค|a large area of land or a part of the body|area||The northern ___ receives half the national rainfall.
+register|v|ลงทะเบียน|to record officially in a list|enrol||All vehicles must ___ with the transport office.
+regulate|v|ควบคุม|to control something by rules|control||A new agency will ___ private clinics.
+reinforce|v|เสริมให้แข็งแกร่งขึ้น|to strengthen or support|strengthen|support|The findings ___ what earlier studies suggested.
+reject|v|ปฏิเสธไม่ยอมรับ|to refuse to accept|refuse|against|Editors ___ most submissions within a week.
+relax|v|ผ่อนคลาย|to become less tense or less strict|loosen||Authorities may ___ the entry requirements.
+release|v|ปล่อย/เผยแพร่|to allow something to be free or made public|issue||The agency will ___ the figures on Monday.
+relevant|adj|ที่เกี่ยวข้องกับเรื่องนั้น|closely connected to the matter at hand|pertinent||Only ___ documents should be attached.
+reluctance|n|ความไม่เต็มใจ|unwillingness to do something|unwillingness||There is clear ___ among banks to lend.
+reluctant|adj|ลังเล ไม่เต็มใจ|unwilling to do something|unwilling||Many witnesses were ___ to testify in court.
+rely|v|พึ่งพาอาศัย|to depend on something for support|depend||Remote clinics ___ on volunteer doctors.
+remove|v|เอาออก|to take something away|eliminate||Filters ___ most heavy metals from the water.
+renaissance|n|ยุคฟื้นฟูศิลปวิทยา, การรื้อฟื้น|a revival of art and learning, especially in Europe|revival||The city enjoyed a cultural ___ in the 1920s.
+reproduction|n|การสืบพันธุ์|the process of producing offspring|breeding||Warming seas have disrupted coral ___.
+reptile|n|สัตว์เลื้อยคลาน|a cold-blooded animal with scales that lays eggs|scaled animal||Every ___ on the island is found nowhere else.
+require|v|ต้องการ|to need something, or to demand it officially|need||The procedure will ___ two trained technicians.
+research|n|วิจัย|systematic study to establish facts|investigation||Her ___ focuses on antibiotic resistance.
+reside|v|พำนักอาศัย|to live in a particular place|dwell||Fewer than a thousand people now ___ on the island.
+resilient|adj|ที่ฟื้นตัวได้เร็ว ยืดหยุ่น|able to recover quickly from difficulty|tough||Small economies proved surprisingly ___ during the crisis.
+resolve|v|แก้ไขให้ยุติ|to settle a problem or dispute|settle||Both sides hope to ___ the dispute out of court.
+resource|n|ทรัพยากร|a supply of something useful|asset||Water is the region's scarcest ___.
+respiration|n|การหายใจระดับเซลล์|the process by which organisms take in and use oxygen|breathing||Plant ___ continues through the night.
+respond|v|ตอบสนอง|to say or do something in reply|reply||The ministry has yet to ___ to the petition.
+restore|v|ฟื้นฟู|to bring something back to a former condition|repair||Engineers hope to ___ power within two days.
+restrain|v|ยับยั้งควบคุมไว้|to hold back or keep under control|curb|limit|The central bank acted to ___ inflation.
+restrict|v|จำกัด|to put a limit on something|limit|limit|The rules ___ fishing to daylight hours.
+retain|v|เก็บรักษาไว้|to keep possession of something|keep||Coastal forests ___ sediment during storms.
+reveal|v|เปิดเผยให้เห็น|to make something known|disclose|show|The scan may ___ damage invisible from outside.
+revenue|n|รายได้|income, especially of a company or government|income||Tax ___ fell sharply during the downturn.
+reverse|v|ทำให้กลับตรงกันข้าม|to change to the opposite direction|overturn||The court moved to ___ the earlier ruling.
+revise|v|ปรับปรุงแก้ไขใหม่|to change or update something written|amend|change|Forecasters had to ___ their estimates downward.
+revolution|n|การปฏิวัติ|a complete change, often political or technological|upheaval||The digital ___ transformed retail banking.
+rigid|adj|แข็งทื่อ ไม่ยืดหยุ่น|stiff, or unwilling to change|inflexible||The curriculum is often criticised as too ___.
+robust|adj|ที่แข็งแรงทนทาน, ที่หนักแน่น|strong and healthy, or well-founded|sturdy||The study rests on a ___ set of data.
+role|n|บทบาท|the function or part played by someone|part||Teachers play a decisive ___ in early literacy.
+rotation|n|การหมุนรอบตัวเอง|the action of turning around a centre|spinning||One ___ of the planet takes just ten hours.
+route|n|เส้นทาง|a way taken from one place to another|path||The new ___ cuts an hour from the journey.
+satellite|n|ดาวเทียม, บริวาร|an object orbiting a planet, natural or artificial|moon||The ___ transmits images twice a day.
+scenario|n|สถานการณ์สมมติ|an imagined sequence of future events|situation||Planners modelled a worst-case ___.
+schedule|n|ตารางเวลา|a plan of when things will happen|timetable||The project is running behind ___.
+scheme|n|แผนการ|an organised plan or arrangement|plan||A pilot ___ will run in three districts.
+scope|n|ขอบเขต ขอบข่าย|the extent of what something deals with|range||A full history lies beyond the ___ of this chapter.
+scrutinize|v|ตรวจสอบอย่างละเอียดถี่ถ้วน|to examine closely and critically|examine|check|Regulators will ___ every transaction over one million baht.
+sculpture|n|ประติมากรรม|a work of art formed by carving or moulding|carving||The bronze ___ stood in the courtyard for centuries.
+section|n|ส่วน|a distinct part of something|part||The reading ___ carries the most marks.
+sector|n|ภาคส่วน|a distinct part of an economy or society|branch||The service ___ now employs most workers.
+secure|v|ทำให้ได้มาอย่างมั่นคง|to obtain or make safe|obtain||The team managed to ___ funding for a second year.
+sediment|n|ตะกอน|solid material that settles at the bottom of liquid|deposit||Layers of ___ record each year's flood.
+seek|v|แสวงหา|to try to find or obtain something|pursue||Refugees ___ shelter in the border camps.
+select|v|เลือก|to choose from a group|choose||Judges ___ ten finalists from four hundred entries.
+sequence|n|ลำดับขั้นตอน|a particular order in which things follow|order||The ___ of events remains disputed.
+series|n|ชุด|a number of similar things coming one after another|sequence||A ___ of tremors preceded the eruption.
+sex|n|เพศ|the two main categories of male and female|gender||Responses were analysed separately by ___.
+shift|n|การเปลี่ยนทิศทาง|a change in position or attitude|change||There has been a marked ___ toward renewable energy.
+significant|adj|ที่มีนัยสำคัญ|important enough to have an effect|notable|key|The difference between groups was not statistically ___.
+similar|adj|คล้ายกัน|resembling something without being identical|alike|same|The two dialects are broadly ___ in structure.
+simulate|v|จำลองสถานการณ์|to imitate conditions for study or training|imitate||The software can ___ traffic flow across the whole city.
+site|n|สถานที่|a place where something is located or happens|location||The ___ was excavated over three seasons.
+so-called|adj|ที่เรียกกันว่า|named or described in a way that may be inaccurate|supposed||The ___ reforms changed very little.
+solar|adj|เกี่ยวกับดวงอาทิตย์|relating to the sun|sun-powered||A ___ eclipse will be visible from the south.
+sole|adj|เพียงผู้เดียว|being the only one|only||She was the ___ survivor of the expedition.
+somewhat|adv|ค่อนข้าง|to a moderate extent|rather||The results were ___ better than expected.
+source|n|แหล่งที่มา|the place something comes from|origin||The ___ of the contamination was never found.
+species|n|ชนิดพันธุ์สิ่งมีชีวิต|a group of organisms able to breed together|kind||More than forty ___ of bat live in the cave system.
+specific|adj|เฉพาะเจาะจง|clearly defined and particular|particular||The grant covers one ___ line of research.
+specify|v|ระบุ|to state something exactly and clearly|stipulate||The contract does not ___ a completion date.
+spectrum|n|สเปกตรัม, ช่วงที่ต่อเนื่องกัน|a band of colours or a full range of something|range||Each element leaves a distinct line in the ___.
+sphere|n|ทรงกลม/ขอบเขต|an area of activity or influence|domain||Education falls within the provincial ___.
+spontaneous|adj|ที่เกิดขึ้นเองโดยไม่ได้วางแผน|happening naturally without external cause|unplanned||Recovery was ___ in about a third of cases.
+stable|adj|คงที่/มั่นคง|firmly fixed and unlikely to change|steady||Prices have remained ___ for two years.
+statistic|n|สถิติ|a piece of numerical data|figure||One ___ dominated the coverage of the report.
+status|n|สถานะ|the position or condition of someone or something|standing||The building was granted heritage ___.
+straightforward|adj|ที่ตรงไปตรงมา ไม่ซับซ้อน|simple and easy to understand|simple||The installation process is reasonably ___.
+strategy|n|กลยุทธ์|a plan designed to achieve a long-term aim|plan||The firm needs a clearer export ___.
+stratum|n|ชั้นหินที่ทับถมกัน|a layer of rock or other material|seam||Each ___ represents several thousand years.
+stress|n|ความเครียด/เน้น|pressure or tension, mental or physical|strain||Chronic ___ affects both sleep and memory.
+structure|n|โครงสร้าง|the arrangement of parts in something|framework||The essay's ___ is clear but its evidence is thin.
+style|n|รูปแบบ|a distinctive manner of doing something|manner||His prose ___ is plain and unadorned.
+submit|v|ส่ง|to present something for consideration|hand in||Candidates must ___ their essays by noon.
+subordinate|adj|ที่อยู่ใต้บังคับบัญชา|lower in rank or importance|inferior||Personal ambition should be ___ to public duty.
+subsequent|adj|ที่ตามมาภายหลัง|coming after something else|following||The error was corrected in ___ editions of the book.
+subsidy|n|เงินอุดหนุน|money paid by a government to support an industry|grant||Farmers depend heavily on the fuel ___.
+substantial|adj|จำนวนมาก มีนัยสำคัญ|large in amount or importance|considerable||The foundation received a ___ donation last year.
+substitute|v|ใช้แทนที่|to use one thing in place of another|replace||Cooks often ___ coconut milk for cream.
+subtle|adj|ที่ละเอียดอ่อนสังเกตยาก|so slight as to be hard to notice|delicate||There is a ___ difference between the two dialects.
+successor|n|ผู้สืบทอด|a person or thing that follows another|replacement||No ___ has yet been named.
+sufficient|adj|เพียงพอ|enough for a particular purpose|adequate||The evidence was not ___ to bring charges.
+sum|n|ผลรวม|a total amount, especially of money|total||The ___ raised exceeded all expectations.
+summary|n|สรุป|a brief statement of the main points|synopsis||A one-page ___ precedes each chapter.
+supplement|n|ส่วนเสริม|something added to complete or improve|addition||Vitamin ___s are widely sold but rarely needed.
+survey|n|แบบสำรวจ|an investigation of opinions or conditions|poll||A national ___ of reading habits began last year.
+survive|v|รอดชีวิต|to continue to live or exist despite difficulty|endure||Few seedlings ___ the first dry season.
+susceptible|adj|อ่อนไหวต่อ เสี่ยงต่อ|easily influenced or harmed by something|vulnerable|weak|Older patients are more ___ to infection.
+suspend|v|ระงับไว้ชั่วคราว|to stop something temporarily|halt||Officials will ___ the permit pending an inquiry.
+sustain|v|ค้ำจุนให้ดำเนินต่อไป|to keep something going over time|maintain|support|Few economies can ___ such growth for a decade.
+symbiosis|n|การอยู่ร่วมกันแบบพึ่งพา|a close relationship benefiting two organisms|mutualism||Coral and algae exist in a delicate ___.
+symbol|n|สัญลักษณ์|a mark or thing representing something else|sign||The elephant became a national ___.
+tape|n|เทป|a long narrow strip used for recording or binding|strip||The original ___ recordings were badly degraded.
+target|n|เป้าหมาย|a result that one aims to achieve|goal||The country missed its emissions ___ again.
+task|n|งาน|a piece of work to be done|job||Sorting the archive is a formidable ___.
+team|n|ทีม|a group working together|crew||A ___ of six divers surveyed the wreck.
+technical|adj|ทางเทคนิค|relating to a specialised subject or skill|specialised||The manual is full of ___ vocabulary.
+technique|n|เทคนิค|a particular way of carrying out a task|method||The dating ___ is accurate to within fifty years.
+technology|n|เทคโนโลยี|the application of scientific knowledge for practical purposes|engineering||Cheap ___ has transformed small-scale farming.
+tectonic|adj|เกี่ยวกับการเคลื่อนตัวของเปลือกโลก|relating to the structure and movement of the earth's plates|crustal||___ activity formed the entire mountain chain.
+telescope|n|กล้องโทรทรรศน์|an instrument for viewing distant objects|scope||The ___ can resolve craters only a kilometre wide.
+temporary|adj|ชั่วคราว|lasting for a limited time|short-term||The clinic occupies a ___ building.
+tense|adj/n|ตึงเครียด, กาลของกริยา|the form of a verb showing time; strained|strained||Relations between the two ministries remain ___.
+tentative|adj|ที่ยังไม่แน่นอน ชั่วคราว|not certain or fixed|provisional||The parties reached a ___ agreement on Friday.
+term|n|เทอม/คำศัพท์|a word or expression, or a fixed period|expression||The ___ is used loosely in everyday speech.
+terrain|n|ภูมิประเทศ ลักษณะพื้นที่|an area of land and its physical features|landscape||The ___ is too broken for wheeled vehicles.
+text|n|ข้อความ|written material|writing||The original ___ survives in a single manuscript.
+theme|n|หัวข้อ|the central subject of a work|subject||Migration is the dominant ___ of her novels.
+theory|n|ทฤษฎี|a set of ideas explaining something|hypothesis||The ___ has held up well against new evidence.
+thereby|adv|ด้วยเหตุนั้น|by that means; as a result of that|thus||Sales rose, ___ offsetting the earlier loss.
+thesis|n|วิทยานิพนธ์, ข้อเสนอหลัก|a long research paper, or a central argument|proposition||His ___ challenges the standard account of the war.
+threshold|n|ขีดเริ่มต้น ระดับขั้นต่ำ|the level at which something starts to happen|limit||Income above the ___ is taxed at a higher rate.
+topic|n|หัวข้อ|the subject of a discussion or piece of writing|subject||Each candidate is given a ___ at random.
+trace|v|สืบสาวย้อนกลับไป|to find the origin or course of something|track||Linguists ___ the word to a Sanskrit root.
+tradition|n|ประเพณี|a long-established custom or belief|custom||The ___ dates back at least four centuries.
+transfer|v|โอน/ย้าย|to move from one place or person to another|move||Patients may ___ to a regional hospital.
+transform|v|แปลงโฉมเปลี่ยนรูป|to change completely in form or nature|convert|change|The railway ___ed the economy of the north.
+transit|n|การขนส่ง/ทางผ่าน|the movement of goods or people through a place|passage||Goods spend a week in ___ at the border.
+transmit|v|ส่งต่อ แพร่กระจาย|to pass something on from one place to another|convey||Mosquitoes ___ the virus between hosts.
+transport|n|การขนส่ง|a system for carrying people or goods|conveyance||Public ___ remains the cheapest way to commute.
+trend|n|แนวโน้ม|a general direction of change|tendency||The long-term ___ is toward smaller households.
+ubiquitous|adj|ที่พบเห็นได้ทุกหนแห่ง|found everywhere|omnipresent|common|Mobile payment apps have become ___ in Thai markets.
+ultimate|adj|ที่เป็นขั้นสุดท้าย สูงสุด|final or most extreme|final||The ___ aim is to eradicate the disease entirely.
+undergo|v|เผชิญ ผ่านกระบวนการ|to experience something, often unpleasant|experience||All applicants must ___ a medical examination.
+underlie|v|เป็นรากฐานอยู่เบื้องหลัง|to be the hidden cause or basis of|underpin||Deep social divisions ___ the current unrest.
+undermine|v|บ่อนทำลาย ทำให้อ่อนแอลง|to weaken something gradually|weaken||Repeated scandals ___ public trust in the police.
+undertake|v|รับดำเนินการ|to commit to and begin a task|attempt||The agency will ___ a full review next year.
+uniform|adj|แบบฟอร์ม/สม่ำเสมอ|the same in all cases and at all times|consistent|same|Thickness must be ___ across the whole sheet.
+unify|v|รวมเป็นหนึ่งเดียว|to bring parts together into one|unite|combine|A single standard would ___ the region's rail network.
+unique|adj|เป็นเอกลักษณ์|being the only one of its kind|singular||Each fingerprint pattern is ___.
+unit|n|หน่วย|a single thing regarded as complete in itself|module||The course is divided into twelve ___s.
+universe|n|จักรวาล|all existing matter and space|cosmos||The observable ___ contains billions of galaxies.
+urban|adj|ในเมือง|relating to a town or city|metropolitan||___ households consume far more water per person.
+urbanization|n|การกลายเป็นเมือง|the growth of towns and cities|city growth||Rapid ___ has outpaced the water supply.
+utilise|v|ใช้ประโยชน์|to make practical use of something|employ||Engineers ___ waste heat to warm the buildings.
+utilize|v|ใช้ประโยชน์จาก|to make practical use of something|employ||Farmers now ___ satellite data to plan their planting.
+vacuum|n|สุญญากาศ|a space entirely empty of matter|void||Sound cannot travel through a ___.
+valid|adj|ที่ใช้ได้ สมเหตุสมผล|logically sound or officially acceptable|legitimate||The objection raises a ___ point about sampling.
+vary|v|แตกต่าง|to differ or change from one case to another|differ|change|Prices ___ considerably between provinces.
+vast|adj|ที่กว้างใหญ่ไพศาล|extremely large in area or amount|immense|big|The ___ plains support millions of grazing animals.
+vegetation|n|พืชพรรณที่ปกคลุมพื้นที่|plants considered collectively|greenery||Dense ___ makes the slope difficult to survey.
+vehicle|n|ยานพาหนะ|a means of transport, or a means of expression|conveyance||Every ___ entering the park is inspected.
+velocity|n|ความเร็วเชิงทิศทาง|speed in a given direction|speed||Escape ___ depends on the mass of the planet.
+version|n|เวอร์ชัน|a particular form of something that differs from others|variant||An earlier ___ of the essay was much longer.
+via|prep|โดยผ่านทาง|by way of or by means of|through||Goods reach the mainland ___ two small ports.
+viable|adj|ที่ทำได้จริง อยู่รอดได้|capable of working successfully|workable|possible|The committee found no ___ alternative to the current plan.
+virtual|adj|ที่เสมือนจริง|almost as described, or simulated by computer|simulated||Students now train on a ___ model of the engine.
+visible|adj|มองเห็นได้|able to be seen|apparent||The damage is ___ from the air.
+vision|n|วิสัยทัศน์|the ability to see, or an imagined future plan|foresight||The plan reflects a clear ___ for the waterfront.
+visual|adj|ทางสายตา|relating to seeing or sight|optical||The lecture relies heavily on ___ material.
+volcanic|adj|เกี่ยวกับภูเขาไฟ|relating to or produced by a volcano|eruptive||___ ash enriched the farmland for generations.
+volume|n|ปริมาณ/เล่ม|the amount of space or the quantity of something|quantity||Traffic ___ doubles during the festival.
+voluntary|adj|ที่ทำโดยสมัครใจ|done by choice rather than compulsion|optional||Participation in the study is entirely ___.
+welfare|n|สวัสดิภาพ สวัสดิการ|the health and wellbeing of people|wellbeing||The bill concerns the ___ of migrant workers.
+whereas|conj|ในขณะที่ (ตรงข้ามกัน)|used to contrast two facts|while||Rainfall rose in the south, ___ the north grew drier.
+whereby|adv|ซึ่งโดยวิธีนั้น|by which means|through which||They set up a scheme ___ students repay after graduating.
+widespread|adj|ที่แพร่หลายเป็นวงกว้าง|found or happening over a large area|extensive|common|The reforms met ___ resistance from teachers.
+xenophobia|n|ความเกลียดกลัวชาวต่างชาติ|strong dislike or fear of foreigners|prejudice||Economic downturns often bring a rise in ___.
+yield|v|ให้ผลผลิต, ยอมจำนน|to produce a result, or to give way|produce||The experiment failed to ___ conclusive data.
+zone|n|เขต|an area with particular characteristics or rules|area||The whole coast is a protected ___.
+`;
+const BANK_BASIC = `
+
+`;
+/* คำอ่าน: คำ|IPA|คำอ่านไทยโดยประมาณ  — สร้างจากพจนานุกรมเสียงอ่าน CMU */
+const BANK_PRON = `
+abandon|/əˈbændən/|อะ-แบน-ดัน
+abound|/əˈbaʊnd/|อะ-บาวนด์
+abstract|/æbˈstrækt/|แอบ-สแตรคท์
+abundant|/əˈbʌndənt/|อะ-บัน-ดันท์
+academic|/ˌækəˈdɛmɪk/|แอ-คะ-เด-มิค
+accelerate|/ækˈsɛlɚˌeɪt/|แอค-เซ-เลอร์-เอท
+access|/ˈækˌsɛs/|แอค-เซส
+accommodate|/əˈkɑməˌdeɪt/|อะ-คา-มะ-เดท
+accompany|/əˈkʌmpəni/|อะ-คัม-พะ-นี
+accumulate|/əˈkjumjəˌleɪt/|อะ-คยู-มยะ-เลท
+accurate|/ˈækjɚət/|แอ-เคยอร์-อัท
+achieve|/əˈtʃiv/|อะ-ชีฟ
+acknowledge|/ækˈnɑlɪdʒ/|แอค-นา-ลิจ
+acquire|/əˈkwaɪɚ/|อะ-ไคว-เออร์
+acute|/əˈkjut/|อะ-คยูท
+adapt|/əˈdæpt/|อะ-แดพท์
+adequate|/ˈædəkwət/|แอ-ดะ-ควัท
+adhere|/ədˈhɪr/|อัด-เฮอร์
+adjacent|/əˈdʒeɪsənt/|อะ-เจ-ซันท์
+adjust|/əˈdʒʌst/|อะ-จัสท์
+administer|/ədˈmɪnəstɚ/|อัด-มิ-นะ-สเตอร์
+administration|/ædˌmɪnɪˈstreɪʃən/|แอด-มิ-นิ-สเตร-ชัน
+adolescent|/ˌædəˈlɛsənt/|แอ-ดะ-เล-ซันท์
+adopt|/əˈdɑpt/|อะ-ดอพท์
+adult|/əˈdʌlt/|อะ-ดัลท์
+adverse|/ædˈvɝs/|แอด-เวิร์ส
+advocate|/ˈædvəkət/|แอด-วะ-คัท
+aesthetic|/ɛsˈθɛtɪk/|เอส-เธ-ทิค
+affect|/əˈfɛkt/|อะ-เฟคท์
+aggregate|/ˈæɡrəɡət/|แอ-กระ-กัท
+albeit|/ɔlˈbiɪt/|ออล-บี-อิท
+alleviate|/əˈliviˌeɪt/|อะ-ลี-วี-เอท
+allocate|/ˈæləˌkeɪt/|แอ-ละ-เคท
+alter|/ˈɔltɚ/|ออล-เทอร์
+alternative|/ɔlˈtɝnətɪv/|ออล-เทอร์-นะ-ทิฟ
+ambiguous|/æmˈbɪɡjuəs/|แอม-บิ-กยู-อัส
+ambition|/æmˈbɪʃən/|แอม-บิ-ชัน
+amend|/əˈmɛnd/|อะ-เมนด์
+amphibian|/æmˈfɪbiən/|แอม-ฟิ-บี-อัน
+ample|/ˈæmpəl/|แอม-พัล
+analogy|/əˈnælədʒi/|อะ-แน-ละ-จี
+analyze|/ˈænəˌlaɪz/|แอ-นะ-ไลซ์
+ancestor|/ˈænˌsɛstɚ/|แอน-เซ-สเตอร์
+ancient|/ˈeɪntʃənt/|เอน-ชันท์
+annual|/ˈænjuəl/|แอ-นยู-อัล
+anticipate|/ænˈtɪsəˌpeɪt/|แอน-ทิ-ซะ-เพท
+apparent|/əˈpɛrənt/|อะ-เพ-รันท์
+append|/əˈpɛnd/|อะ-เพนด์
+appendix|/əˈpɛndɪks/|อะ-เพน-ดิคส์
+apply|/əˈplaɪ/|อะ-ไพล
+appraisal|/əˈpreɪzəl/|อะ-เพร-ซัล
+appreciate|/əˈpriʃiˌeɪt/|อะ-พรี-ชี-เอท
+approach|/əˈproʊtʃ/|อะ-โพรช
+appropriate|/əˈproʊpriət/|อะ-โพร-พรี-อัท
+approximate|/əˈprɑksəmət/|อะ-พรอค-ซะ-มัท
+arbitrary|/ˈɑrbəˌtrɛri/|อาร์-บะ-เทร-รี
+architecture|/ˈɑrkəˌtɛktʃɚ/|อาร์-คะ-เทค-เชอร์
+archive|/ˈɑrˌkaɪv/|อาร์-ไคฟ์
+arduous|/ˈɑrdʒuəs/|อาร์-จู-อัส
+area|/ˈɛriə/|เอ-รี-อะ
+arid|/ˈærəd/|แอ-รัด
+artifact|/ˈɑrtəˌfækt/|อาร์-ทะ-แฟคท์
+artificial|/ˌɑrtəˈfɪʃəl/|อาร์-ทะ-ฟิ-ชัล
+ascertain|/ˌæsɚˈteɪn/|แอ-เสอร์-เทน
+aspect|/ˈæˌspɛkt/|แอ-สเปคท์
+aspiration|/ˌæspɚˈeɪʃən/|แอ-สเปอร์-เอ-ชัน
+aspire|/əˈspaɪr/|อะ-สไปร์
+assemble|/əˈsɛmbəl/|อะ-เซม-บัล
+assert|/əˈsɝt/|อะ-เสิร์ท
+assess|/əˈsɛs/|อะ-เซส
+assign|/əˈsaɪn/|อะ-ไซน์
+assimilate|/əˈsɪməˌleɪt/|อะ-ซิ-มะ-เลท
+assist|/əˈsɪst/|อะ-ซิสท์
+assume|/əˈsum/|อะ-ซูม
+assure|/əˈʃʊr/|อะ-เชอร์
+asteroid|/ˈæstɚˌɔɪd/|แอ-สเตอร์-ออยด์
+atmosphere|/ˈætməˌsfɪr/|แอท-มะ-เสฟอร์
+atom|/ˈætəm/|แอ-ทัม
+attach|/əˈtætʃ/|อะ-แทช
+attain|/əˈteɪn/|อะ-เทน
+attitude|/ˈætəˌtud/|แอ-ทะ-ทูด
+attribute|/ˈætrəˌbjut/|แอ-ทระ-บยูท
+augment|/ɔɡˈmɛnt/|ออก-เมนท์
+author|/ˈɔθɚ/|ออ-เธอร์
+authority|/əˈθɔrəti/|อะ-ธอ-ระ-ที
+authorize|/ˈɔθɚˌaɪz/|ออ-เธอร์-ไอซ์
+automate|/ˈɔtəˌmeɪt/|ออ-ทะ-เมท
+available|/əˈveɪləbəl/|อะ-เว-ละ-บัล
+avert|/əˈvɝt/|อะ-เวิร์ท
+aware|/əˈwɛr/|อะ-เวอร์
+axis|/ˈæksəs/|แอค-ซัส
+barrier|/ˈbæriɚ/|แบ-รี-เออร์
+basin|/ˈbeɪsən/|เบ-ซัน
+basis|/ˈbeɪsəs/|เบ-ซัส
+behalf|/bɪˈhæf/|บิ-แฮฟ
+beneficial|/ˌbɛnəˈfɪʃəl/|เบ-นะ-ฟิ-ชัล
+benefit|/ˈbɛnəfɪt/|เบ-นะ-ฟิท
+bias|/ˈbaɪəs/|ไบ-อัส
+binary|/ˈbaɪnɚi/|ไบ-เนอร์-อี
+bizarre|/bəˈzɑr/|บะ-ซาร์
+blunder|/ˈblʌndɚ/|บลัน-เดอร์
+bond|/ˈbɑnd/|บอนด์
+breakthrough|/ˈbreɪkˌθru/|เบรค-ธรู
+brief|/ˈbrif/|บรีฟ
+brittle|/ˈbrɪtəl/|บริ-ทัล
+bulk|/ˈbʌlk/|บัลค์
+canyon|/ˈkænjən/|แค-นยัน
+capability|/ˌkeɪpəˈbɪləti/|เค-พะ-บิ-ละ-ที
+capable|/ˈkeɪpəbəl/|เค-พะ-บัล
+capacity|/kəˈpæsəti/|คะ-แพ-ซะ-ที
+category|/ˈkætəˌɡɔri/|แค-ทะ-กอ-รี
+cease|/ˈsis/|ซีส
+celestial|/səˈlɛstʃəl/|ซะ-เลส-ชัล
+challenge|/ˈtʃæləndʒ/|แช-ลันจ์
+channel|/ˈtʃænəl/|แช-นัล
+chapter|/ˈtʃæptɚ/|แชพ-เทอร์
+chart|/ˈtʃɑrt/|ชาร์ท
+chemical|/ˈkɛməkəl/|เค-มะ-คัล
+chronic|/ˈkrɑnɪk/|ครา-นิค
+circulate|/ˈsɝkjəˌleɪt/|เสอร์-คยะ-เลท
+circumstance|/ˈsɝkəmˌstæns/|เสอร์-คัม-สแตนส์
+cite|/ˈsaɪt/|ไซท์
+civil|/ˈsɪvəl/|ซิ-วัล
+civilization|/ˌsɪvəlɪˈzeɪʃən/|ซิ-วะ-ลิ-เซ-ชัน
+clarify|/ˈklɛrəˌfaɪ/|เคล-ระ-ไฟ
+classic|/ˈklæsɪk/|แคล-ซิค
+clause|/ˈklɔz/|คลอซ
+climate|/ˈklaɪmət/|ไคล-มัท
+code|/ˈkoʊd/|โคด
+coherent|/koʊˈhɪrənt/|โค-ฮิ-รันท์
+coincide|/ˌkoʊɪnˈsaɪd/|โค-อิน-ไซด์
+collaborate|/kəˈlæbɚˌeɪt/|คะ-แล-เบอร์-เอท
+collapse|/kəˈlæps/|คะ-แลพส์
+colleague|/ˈkɑliɡ/|คา-ลีก
+collect|/kəˈlɛkt/|คะ-เลคท์
+combine|/ˈkɑmbaɪn/|คอม-ไบน์
+comet|/ˈkɑmət/|คา-มัท
+commence|/kəˈmɛns/|คะ-เมนส์
+comment|/ˈkɑmɛnt/|คา-เมนท์
+commerce|/ˈkɑmɚs/|คา-เมิร์ส
+commission|/kəˈmɪʃən/|คะ-มิ-ชัน
+commit|/kəˈmɪt/|คะ-มิท
+commitment|/kəˈmɪtmənt/|คะ-มิท-มันท์
+commodity|/kəˈmɑdəti/|คะ-มา-ดะ-ที
+communicate|/kəˈmjunəˌkeɪt/|คะ-มยู-นะ-เคท
+community|/kəˈmjunəti/|คะ-มยู-นะ-ที
+comparable|/ˈkɑmpɚəbəl/|คอม-เพอร์-อะ-บัล
+compatible|/kəmˈpætəbəl/|คัม-แพ-ทะ-บัล
+compel|/kəmˈpɛl/|คัม-เพล
+compensate|/ˈkɑmpənˌseɪt/|คอม-พัน-เซท
+compile|/kəmˈpaɪl/|คัม-ไพล์
+complement|/ˈkɑmpləmənt/|คอม-พละ-มันท์
+complex|/ˈkɑmplɛks/|คอม-เพลคส์
+compliance|/kəmˈplaɪəns/|คัม-ไพล-อันส์
+component|/kəmˈpoʊnənt/|คัม-โพ-นันท์
+compound|/ˈkɑmpaʊnd/|คอม-พาวนด์
+comprehensive|/ˌkɑmpriˈhɛnsɪv/|คอม-พรี-เฮน-ซิฟ
+comprise|/kəmˈpraɪz/|คัม-ไพรซ์
+compute|/kəmˈpjut/|คัม-พยูท
+conceal|/kənˈsil/|คัน-ซีล
+concede|/kənˈsid/|คัน-ซีด
+conceive|/kənˈsiv/|คัน-ซีฟ
+concentrate|/ˈkɑnsənˌtreɪt/|คอน-ซัน-เทรท
+concept|/ˈkɑnsɛpt/|คอน-เซพท์
+concise|/kənˈsaɪs/|คัน-ไซส์
+conclude|/kənˈklud/|คัน-คลูด
+concrete|/kənˈkrit/|คัน-ครีท
+concurrent|/kənˈkɝənt/|คัน-เคอร์-อันท์
+conduct|/ˈkɑndəkt/|คอน-ดัคท์
+confer|/kənˈfɝ/|คัน-เฟอร์
+confine|/kənˈfaɪn/|คัน-ไฟน์
+confirm|/kənˈfɝm/|คัน-เฟิร์ม
+conflict|/ˈkɑnflɪkt/|คอน-ฟลิคท์
+conform|/kənˈfɔrm/|คัน-ฟอร์ม
+consecutive|/kənˈsɛkjətɪv/|คัน-เซ-คยะ-ทิฟ
+consent|/kənˈsɛnt/|คัน-เซนท์
+consequent|/ˈkɑnsəkwənt/|คอน-ซะ-ควันท์
+conservative|/kənˈsɝvətɪv/|คัน-เสอร์-วะ-ทิฟ
+considerable|/kənˈsɪdɚəbəl/|คัน-ซิ-เดอร์-อะ-บัล
+consist|/kənˈsɪst/|คัน-ซิสท์
+consistent|/kənˈsɪstənt/|คัน-ซิ-สตันท์
+consolidate|/kənˈsɑlɪˌdeɪt/|คัน-ซา-ลิ-เดท
+conspicuous|/kənˈspɪkjuəs/|คัน-สปิ-คยู-อัส
+constant|/ˈkɑnstənt/|คอน-สตันท์
+constitute|/ˈkɑnstəˌtut/|คอน-สตะ-ทูท
+constrain|/kənˈstreɪn/|คัน-สเตรน
+construct|/kənˈstrʌkt/|คัน-สตรัคท์
+consult|/kənˈsʌlt/|คัน-ซัลท์
+consume|/kənˈsum/|คัน-ซูม
+contact|/ˈkɑnˌtækt/|คอน-แทคท์
+contemporary|/kənˈtɛmpɚˌɛri/|คัน-เทม-เพอร์-เอ-รี
+context|/ˈkɑntɛkst/|คอน-เทคสท์
+contract|/ˈkɑnˌtrækt/|คอน-แทรคท์
+contradict|/ˌkɑntrəˈdɪkt/|คอน-ทระ-ดิคท์
+contrary|/ˈkɑntrɛri/|คอน-เทร-รี
+contrast|/ˈkɑntræst/|คอน-แทรสท์
+contribute|/kənˈtrɪbjut/|คัน-ทริ-บยูท
+controversial|/ˌkɑntrəˈvɝʃəl/|คอน-ทระ-เวอร์-ชัล
+controversy|/ˈkɑntrəˌvɝsi/|คอน-ทระ-เวอร์-ซี
+convene|/kənˈvin/|คัน-วีน
+convention|/kənˈvɛnʃən/|คัน-เวน-ชัน
+converse|/ˈkɑnvɚs/|คอน-เวิร์ส
+convert|/ˈkɑnvɚt/|คอน-เวิร์ท
+convey|/kənˈveɪ/|คัน-เว
+convince|/kənˈvɪns/|คัน-วินส์
+cooperate|/koʊˈɑpɚˌeɪt/|โค-อา-เพอร์-เอท
+coordinate|/koʊˈɔrdənət/|โค-ออร์-ดะ-นัท
+core|/ˈkɔr/|คอร์
+corporate|/ˈkɔrpɚət/|คอร์-เพอร์-อัท
+correlate|/ˈkɔrəˌleɪt/|คอ-ระ-เลท
+correspond|/ˌkɔrəˈspɑnd/|คอ-ระ-สปอนด์
+couple|/ˈkʌpəl/|คะ-พัล
+create|/kriˈeɪt/|ครี-เอท
+credit|/ˈkrɛdət/|เคร-ดัท
+criteria|/kraɪˈtɪriə/|ไคร-ทิ-รี-อะ
+crucial|/ˈkruʃəl/|ครู-ชัล
+crust|/ˈkrʌst/|ครัสท์
+cultivate|/ˈkʌltəˌveɪt/|คัล-ทะ-เวท
+culture|/ˈkʌltʃɚ/|คัล-เชอร์
+cumulative|/ˈkjumjələtɪv/|คยู-มยะ-ละ-ทิฟ
+currency|/ˈkɝənsi/|เคอร์-อัน-ซี
+curriculum|/kɚˈɪkjələm/|เคอร์-อิ-คยะ-ลัม
+cycle|/ˈsaɪkəl/|ไซ-คัล
+data|/ˈdeɪtə/|เด-ทะ
+debate|/dəˈbeɪt/|ดะ-เบท
+decade|/dɛˈkeɪd/|เด-เคด
+decisive|/dɪˈsaɪsɪv/|ดิ-ไซ-ซิฟ
+decline|/dɪˈklaɪn/|ดิ-ไคลน์
+deduce|/dɪˈdus/|ดิ-ดูส
+deficiency|/dɪˈfɪʃənsi/|ดิ-ฟิ-ชัน-ซี
+deficient|/dɪˈfɪʃənt/|ดิ-ฟิ-ชันท์
+define|/dɪˈfaɪn/|ดิ-ไฟน์
+definite|/ˈdɛfənət/|เด-ฟะ-นัท
+deliberate|/dɪˈlɪbɚət/|ดิ-ลิ-เบอร์-อัท
+delta|/ˈdɛltə/|เดล-ทะ
+democracy|/dɪˈmɑkrəsi/|ดิ-มา-คระ-ซี
+demonstrate|/ˈdɛmənˌstreɪt/|เด-มัน-สเตรท
+denote|/dɪˈnoʊt/|ดิ-โนท
+dense|/ˈdɛns/|เดนส์
+density|/ˈdɛnsəti/|เดน-ซะ-ที
+deny|/dɪˈnaɪ/|ดิ-ไน
+depict|/dɪˈpɪkt/|ดิ-พิคท์
+deplete|/dɪˈplit/|ดิ-พลีท
+depress|/dɪˈprɛs/|ดิ-เพรส
+derive|/dɚˈaɪv/|เดอร์-ไอฟ์
+design|/dɪˈzaɪn/|ดิ-ไซน์
+despite|/dɪˈspaɪt/|ดิ-สไปท์
+detect|/dɪˈtɛkt/|ดิ-เทคท์
+deteriorate|/dɪˈtɪriɚˌeɪt/|ดิ-ทิ-รี-เออร์-เอท
+detrimental|/ˌdɛtrəˈmɛntəl/|เด-ทระ-เมน-ทัล
+deviate|/ˈdiviˌeɪt/|ดี-วี-เอท
+device|/dɪˈvaɪs/|ดิ-ไวส์
+devote|/dɪˈvoʊt/|ดิ-โวท
+differentiate|/ˌdɪfɚˈɛnʃiˌeɪt/|ดิ-เฟอร์-เอน-ชี-เอท
+digestion|/daɪˈdʒɛstʃən/|ได-เจส-ชัน
+dimension|/dɪˈmɛnʃən/|ดิ-เมน-ชัน
+diminish|/dɪˈmɪnɪʃ/|ดิ-มิ-นิช
+discourse|/ˈdɪskɔrs/|ดิ-สกอร์ส
+discrepancy|/dɪˈskrɛpənsi/|ดิ-สเกร-พัน-ซี
+discrete|/dɪˈskrit/|ดิ-สกรีท
+discriminate|/dɪˈskrɪməˌneɪt/|ดิ-สกริ-มะ-เนท
+displace|/dɪˈspleɪs/|ดิ-สเปลส
+display|/dɪˈspleɪ/|ดิ-สเปล
+dispose|/dɪˈspoʊz/|ดิ-สโปซ
+distinction|/dɪˈstɪŋkʃən/|ดิ-สติงค์-ชัน
+distort|/dɪˈstɔrt/|ดิ-สตอร์ท
+distribute|/dɪˈstrɪbjut/|ดิ-สตริ-บยูท
+diverse|/daɪˈvɝs/|ได-เวิร์ส
+diversity|/dɪˈvɝsɪti/|ดิ-เวอร์-ซิ-ที
+document|/ˈdɑkjəmɛnt/|ดา-คยะ-เมนท์
+domain|/doʊˈmeɪn/|โด-เมน
+domestic|/dəˈmɛstɪk/|ดะ-เม-สติค
+dominant|/ˈdɑmənənt/|ดา-มะ-นันท์
+dominate|/ˈdɑməˌneɪt/|ดา-มะ-เนท
+dormant|/ˈdɔrmənt/|ดอร์-มันท์
+draft|/ˈdræft/|แดรฟท์
+drama|/ˈdrɑmə/|ดรา-มะ
+drastic|/ˈdræstɪk/|แดร-สติค
+durable|/ˈdʊrəbəl/|ดุ-ระ-บัล
+duration|/ˈdʊˈreɪʃən/|ดุ-เร-ชัน
+dynamic|/daɪˈnæmɪk/|ได-แน-มิค
+earthquake|/ˈɝθˌkweɪk/|เอิร์ธ-เควค
+economy|/ɪˈkɑnəmi/|อิ-คา-นะ-มี
+ecosystem|/ˈikoʊˌsɪstəm/|อี-โค-ซิ-สตัม
+edit|/ˈɛdət/|เอ-ดัท
+efficient|/ɪˈfɪʃənt/|อิ-ฟิ-ชันท์
+elaborate|/ɪˈlæbrət/|อิ-แล-บรัท
+element|/ˈɛləmənt/|เอ-ละ-มันท์
+eliminate|/ɪˈlɪməˌneɪt/|อิ-ลิ-มะ-เนท
+emerge|/ɪˈmɝdʒ/|อิ-เมิร์จ
+eminent|/ˈɛmənənt/|เอ-มะ-นันท์
+emphasis|/ˈɛmfəsəs/|เอม-ฟะ-ซัส
+empirical|/ˌɛmˈpɪrɪkəl/|เอม-พิ-ริ-คัล
+enable|/ɛˈneɪbəl/|เอ-เน-บัล
+encounter|/ɪnˈkaʊntɚ/|อิน-คาวน์-เทอร์
+endeavor|/ɪnˈdɛvɚ/|อิน-เด-เวอร์
+energy|/ˈɛnɚdʒi/|เอ-เนอร์-จี
+enforce|/ɛnˈfɔrs/|เอน-ฟอร์ส
+enhance|/ɛnˈhæns/|เอน-แฮนส์
+enormous|/ɪˈnɔrməs/|อิ-นอร์-มัส
+ensure|/ɛnˈʃʊr/|เอน-เชอร์
+entity|/ˈɛntəti/|เอน-ทะ-ที
+environment|/ɪnˈvaɪrənmənt/|อิน-ไว-รัน-มันท์
+equate|/ɪˈkweɪt/|อิ-เควท
+equip|/ɪˈkwɪp/|อิ-ควิพ
+equivalent|/ɪˈkwɪvələnt/|อิ-ควิ-วะ-ลันท์
+era|/ˈɛrə/|เอ-ระ
+erosion|/ɪˈroʊʒən/|อิ-โร-ชัน
+error|/ˈɛrɚ/|เอ-เรอร์
+essential|/ɛˈsɛnʃəl/|เอ-เซน-ชัล
+establish|/ɪˈstæblɪʃ/|อิ-สแต-บลิช
+estate|/ɪˈsteɪt/|อิ-สเตท
+estimate|/ˈɛstəmət/|เอ-สตะ-มัท
+ethic|/ˈɛθɪk/|เอ-ธิค
+ethics|/ˈɛθɪks/|เอ-ธิคส์
+ethnic|/ˈɛθnɪk/|เอธ-นิค
+evaluate|/ɪˈvæljuˌeɪt/|อิ-แว-ลยู-เอท
+evaporation|/ɪˌvæpɚˈeɪʃən/|อิ-แว-เพอร์-เอ-ชัน
+eventual|/əˈvɛntʃuəl/|อะ-เวน-ชู-อัล
+evident|/ˈɛvədənt/|เอ-วะ-ดันท์
+evolution|/ˌɛvəˈluʃən/|เอ-วะ-ลู-ชัน
+exacerbate|/ɪɡˈzæsɚˌbeɪt/|อิก-แซ-เสอร์-เบท
+exaggerate|/ɪɡˈzædʒɚˌeɪt/|อิก-แซ-เจอร์-เอท
+exceed|/ɪkˈsid/|อิค-ซีด
+excessive|/ɪkˈsɛsɪv/|อิค-เซ-ซิฟ
+exclude|/ɪksˈklud/|อิคส์-คลูด
+exemplify|/ɪɡˈzɛmpləˌfaɪ/|อิก-เซม-พละ-ไฟ
+exhibit|/ɪɡˈzɪbɪt/|อิก-ซิ-บิท
+exotic|/ɪɡˈzɑtɪk/|อิก-ซา-ทิค
+expand|/ɪkˈspænd/|อิค-สแปนด์
+expert|/ˈɛkspɚt/|เอค-สเปิร์ท
+explicit|/ɪkˈsplɪsət/|อิค-สปลิ-ซัท
+exploit|/ˈɛkˌsplɔɪt/|เอค-สปลอยท์
+export|/ˈɛkspɔrt/|เอค-สปอร์ท
+expose|/ɪkˈspoʊz/|อิค-สโปซ
+extensive|/ɪkˈstɛnsɪv/|อิค-สเตน-ซิฟ
+external|/ɪkˈstɝnəl/|อิค-สเตอร์-นัล
+extract|/ˈɛkˌstrækt/|เอค-สแตรคท์
+facilitate|/fəˈsɪləˌteɪt/|ฟะ-ซิ-ละ-เทท
+factor|/ˈfæktɚ/|แฟค-เทอร์
+fauna|/ˈfɔnə/|ฟอ-นะ
+feasible|/ˈfizəbəl/|ฟี-ซะ-บัล
+feature|/ˈfitʃɚ/|ฟี-เชอร์
+federal|/ˈfɛdɚəl/|เฟ-เดอร์-อัล
+fee|/ˈfi/|ฟี
+file|/ˈfaɪl/|ไฟล์
+final|/ˈfaɪnəl/|ไฟ-นัล
+finance|/fəˈnæns/|ฟะ-แนนส์
+finite|/ˈfaɪˌnaɪt/|ไฟ-ไนท์
+flexible|/ˈflɛksəbəl/|เฟลค-ซะ-บัล
+flora|/ˈflɔrə/|ฟลอ-ระ
+fluctuate|/ˈflʌktʃəˌweɪt/|ฟลัค-ชะ-เวท
+focus|/ˈfoʊkəs/|โฟ-คัส
+forecast|/ˈfɔrˌkæst/|ฟอร์-แคสท์
+format|/ˈfɔrˌmæt/|ฟอร์-แมท
+formula|/ˈfɔrmjələ/|ฟอร์-มยะ-ละ
+formulate|/ˈfɔrmjəˌleɪt/|ฟอร์-มยะ-เลท
+forthcoming|/ˈfɔrθˈkʌmɪŋ/|ฟอร์ธ-คะ-มิง
+fossil|/ˈfɑsəl/|ฟา-ซัล
+foster|/ˈfɑstɚ/|ฟา-สเตอร์
+foundation|/faʊnˈdeɪʃən/|ฟาวน์-เด-ชัน
+fragile|/ˈfrædʒəl/|แฟร-จัล
+framework|/ˈfreɪmˌwɝk/|เฟรม-เวิร์ค
+function|/ˈfʌŋkʃən/|ฟังค์-ชัน
+fundamental|/ˌfʌndəˈmɛntəl/|ฟัน-ดะ-เมน-ทัล
+furthermore|/ˈfɝðɚˌmɔr/|เฟอร์-เดอร์-มอร์
+galaxy|/ˈɡæləksi/|แก-ลัค-ซี
+generate|/ˈdʒɛnɚˌeɪt/|เจ-เนอร์-เอท
+generation|/ˌdʒɛnɚˈeɪʃən/|เจ-เนอร์-เอ-ชัน
+genuine|/ˈdʒɛnjəwən/|เจ-นยะ-วัน
+glacier|/ˈɡleɪʃɚ/|เกล-เชอร์
+globe|/ˈɡloʊb/|โกลบ
+goal|/ˈɡoʊl/|โกล
+grade|/ˈɡreɪd/|เกรด
+grant|/ˈɡrænt/|แกรนท์
+gravity|/ˈɡrævəti/|แกร-วะ-ที
+guarantee|/ˌɡɛrənˈti/|เก-รัน-ที
+guideline|/ˈɡaɪdˌlaɪn/|ไกด์-ไลน์
+habitat|/ˈhæbəˌtæt/|แฮ-บะ-แทท
+halt|/ˈhɔlt/|ฮอลท์
+harness|/ˈhɑrnəs/|ฮาร์-นัส
+hazardous|/ˈhæzɚdəs/|แฮ-เซอร์-ดัส
+hence|/ˈhɛns/|เฮนส์
+heritage|/ˈhɛrətədʒ/|เฮ-ระ-ทัจ
+hierarchy|/ˈhaɪɚˌɑrki/|ไฮ-เออร์-อาร์-คี
+highlight|/ˈhaɪˌlaɪt/|ไฮ-ไลท์
+hinder|/ˈhɪndɚ/|ฮิน-เดอร์
+humid|/ˈhjuməd/|ฮยู-มัด
+hypothesis|/haɪˈpɑθəsəs/|ไฮ-พา-ธะ-ซัส
+hypothesize|/haɪˈpɑθəˌsaɪz/|ไฮ-พา-ธะ-ไซซ์
+identical|/aɪˈdɛntɪkəl/|ไอ-เดน-ทิ-คัล
+identify|/aɪˈdɛntəˌfaɪ/|ไอ-เดน-ทะ-ไฟ
+ideology|/ˌaɪdiˈɑlədʒi/|ไอ-ดี-อา-ละ-จี
+ignorance|/ˈɪɡnɚəns/|อิก-เนอร์-อันส์
+illuminate|/ˌɪˈlumɪnɪt/|อิ-ลู-มิ-นิท
+illustrate|/ˈɪləˌstreɪt/|อิ-ละ-สเตรท
+image|/ˈɪmədʒ/|อิ-มัจ
+immigrate|/ˈɪməˌɡreɪt/|อิ-มะ-เกรท
+imminent|/ˈɪmənənt/|อิ-มะ-นันท์
+impact|/ˌɪmˈpækt/|อิม-แพคท์
+implement|/ˈɪmpləmənt/|อิม-พละ-มันท์
+implicate|/ˈɪmplɪˌkeɪt/|อิม-พลิ-เคท
+implication|/ˌɪmpləˈkeɪʃən/|อิม-พละ-เค-ชัน
+implicit|/ˌɪmˈplɪsət/|อิม-พลิ-ซัท
+imply|/ˌɪmˈplaɪ/|อิม-ไพล
+impose|/ˌɪmˈpoʊz/|อิม-โพซ
+inadequate|/ˌɪˈnædəkwət/|อิ-แน-ดะ-ควัท
+incentive|/ˌɪnˈsɛntɪv/|อิน-เซน-ทิฟ
+incidence|/ˈɪnsədəns/|อิน-ซะ-ดันส์
+inclination|/ˌɪnkləˈneɪʃən/|อิน-คละ-เน-ชัน
+income|/ˈɪnˌkʌm/|อิน-คัม
+incorporate|/ˌɪnˈkɔrpɚˌeɪt/|อิน-คอร์-เพอร์-เอท
+incredible|/ˌɪnˈkrɛdəbəl/|อิน-เคร-ดะ-บัล
+index|/ˈɪndɛks/|อิน-เดคส์
+indicate|/ˈɪndəˌkeɪt/|อิน-ดะ-เคท
+indispensable|/ˌɪndɪˈspɛnsəbəl/|อิน-ดิ-สเปน-ซะ-บัล
+individual|/ˌɪndəˈvɪdʒəwəl/|อิน-ดะ-วิ-จะ-วัล
+induce|/ˌɪnˈdus/|อิน-ดูส
+inevitable|/ˌɪˈnɛvətəbəl/|อิ-เน-วะ-ทะ-บัล
+infer|/ˌɪnˈfɝ/|อิน-เฟอร์
+inflation|/ˌɪnˈfleɪʃən/|อิน-เฟล-ชัน
+infrastructure|/ˌɪnfrəˈstrʌktʃɚ/|อิน-ฟระ-สตรัค-เชอร์
+inherent|/ɪnˈhɪrənt/|อิน-ฮิ-รันท์
+inhibit|/ˌɪnˈhɪbət/|อิน-ฮิ-บัท
+initial|/ˌɪˈnɪʃəl/|อิ-นิ-ชัล
+initiate|/ˌɪˈnɪʃiˌeɪt/|อิ-นิ-ชี-เอท
+injure|/ˈɪndʒɚ/|อิน-เจอร์
+innate|/ˌɪˈneɪt/|อิ-เนท
+innovate|/ˈɪnəˌveɪt/|อิ-นะ-เวท
+innovation|/ˌɪnəˈveɪʃən/|อิ-นะ-เว-ชัน
+innovative|/ˈɪnəˌveɪtɪv/|อิ-นะ-เว-ทิฟ
+input|/ˈɪnˌpʊt/|อิน-พุท
+insight|/ˈɪnˌsaɪt/|อิน-ไซท์
+inspect|/ˌɪnˈspɛkt/|อิน-สเปคท์
+instance|/ˈɪnstəns/|อิน-สตันส์
+institute|/ˈɪnstəˌtut/|อิน-สตะ-ทูท
+instruct|/ˌɪnˈstrʌkt/|อิน-สตรัคท์
+instrument|/ˈɪnstrəmənt/|อิน-สตระ-มันท์
+integral|/ˈɪntəɡrəl/|อิน-ทะ-กรัล
+integrate|/ˈɪntəˌɡreɪt/|อิน-ทะ-เกรท
+integrity|/ˌɪnˈtɛɡrəti/|อิน-เท-กระ-ที
+intelligence|/ˌɪnˈtɛlədʒəns/|อิน-เท-ละ-จันส์
+intense|/ˌɪnˈtɛns/|อิน-เทนส์
+interact|/ˌɪntɚˈækt/|อิน-เทอร์-แอคท์
+intermediate|/ˌɪntɚˈmidiɪt/|อิน-เทอร์-มี-ดี-อิท
+internal|/ˌɪnˈtɝnəl/|อิน-เทอร์-นัล
+interpret|/ˌɪnˈtɝprət/|อิน-เทอร์-พรัท
+interval|/ˈɪntɚvəl/|อิน-เทอร์-วัล
+intervene|/ˌɪntɚˈvin/|อิน-เทอร์-วีน
+intricate|/ˈɪntrəkət/|อิน-ทระ-คัท
+intrinsic|/ˌɪnˈtrɪnsɪk/|อิน-ทริน-ซิค
+invaluable|/ˌɪnˈvæljəbəl/|อิน-แว-ลยะ-บัล
+invest|/ˌɪnˈvɛst/|อิน-เวสท์
+investigate|/ˌɪnˈvɛstəˌɡeɪt/|อิน-เว-สตะ-เกท
+invisible|/ˌɪnˈvɪzəbəl/|อิน-วิ-ซะ-บัล
+invoke|/ˌɪnˈvoʊk/|อิน-โวค
+involve|/ˌɪnˈvɑlv/|อิน-วอลฟ์
+isolate|/ˈaɪsəˌleɪt/|ไอ-ซะ-เลท
+isolated|/ˈaɪsəˌleɪtəd/|ไอ-ซะ-เล-ทัด
+issue|/ˈɪʃu/|อิ-ชู
+item|/ˈaɪtəm/|ไอ-ทัม
+jeopardize|/ˈdʒɛpɚˌdaɪz/|เจ-เพอร์-ไดซ์
+job|/ˈdʒɑb/|จอบ
+journal|/ˈdʒɝnəl/|เจอร์-นัล
+justify|/ˈdʒʌstəˌfaɪ/|จะ-สตะ-ไฟ
+keen|/ˈkin/|คีน
+kernel|/ˈkɝnəl/|เคอร์-นัล
+keynote|/ˈkiˌnoʊt/|คี-โนท
+kindle|/ˈkɪndəl/|คิน-ดัล
+kinetic|/kəˈnɛtɪk/|คะ-เน-ทิค
+kinship|/ˈkɪnˌʃɪp/|คิน-ชิพ
+kinsman|/ˈkɪnzˌmæn/|คินซ์-แมน
+knack|/ˈnæk/|แนค
+knowledge|/ˈnɑlədʒ/|นา-ลัจ
+knowledgeable|/ˈnɑlədʒəbəl/|นา-ละ-จะ-บัล
+kudos|/ˈkudoʊs/|คู-โดส
+label|/ˈleɪbəl/|เล-บัล
+labour|/ˈleɪbɚ/|เล-เบอร์
+layer|/ˈleɪɚ/|เล-เออร์
+lecture|/ˈlɛktʃɚ/|เลค-เชอร์
+legal|/ˈliɡəl/|ลี-กัล
+legislate|/ˈlɛdʒɪˌsleɪt/|เล-จิ-สเลท
+legislation|/ˌlɛdʒəˈsleɪʃən/|เล-จะ-สเล-ชัน
+legitimate|/ləˈdʒɪtəmət/|ละ-จิ-ทะ-มัท
+lethal|/ˈliθəl/|ลี-ธัล
+levy|/ˈlɛvi/|เล-วี
+liberal|/ˈlɪˌbɝəl/|ลิ-เบอร์-อัล
+licence|/ˈlaɪsəns/|ไล-ซันส์
+likewise|/ˈlaɪˌkwaɪz/|ไล-ไควซ์
+link|/ˈlɪŋk/|ลิงค์
+locate|/ˈloʊˌkeɪt/|โล-เคท
+logic|/ˈlɑdʒɪk/|ลา-จิค
+lucrative|/ˈlukrətɪv/|ลู-คระ-ทิฟ
+lunar|/ˈlunɚ/|ลู-เนอร์
+magnitude|/ˈmæɡnəˌtud/|แมก-นะ-ทูด
+maintain|/meɪnˈteɪn/|เมน-เทน
+major|/ˈmeɪdʒɚ/|เม-เจอร์
+majority|/məˈdʒɔrəti/|มะ-จอ-ระ-ที
+mammal|/ˈmæməl/|แม-มัล
+manifest|/ˈmænəˌfɛst/|แม-นะ-เฟสท์
+manipulate|/məˈnɪpjəˌleɪt/|มะ-นิ-พยะ-เลท
+mantle|/ˈmæntəl/|แมน-ทัล
+manual|/ˈmænjuəl/|แม-นยู-อัล
+margin|/ˈmɑrdʒən/|มาร์-จัน
+marginal|/ˈmɑrdʒənəl/|มาร์-จะ-นัล
+mass|/ˈmæs/|แมส
+massive|/ˈmæsɪv/|แม-ซิฟ
+mature|/məˈtʃʊr/|มะ-เชอร์
+maximise|/ˈmæksəˌmaɪz/|แมค-ซะ-ไมซ์
+mechanism|/ˈmɛkəˌnɪzəm/|เม-คะ-นิ-ซัม
+media|/ˈmidiə/|มี-ดี-อะ
+medical|/ˈmɛdəkəl/|เม-ดะ-คัล
+medium|/ˈmidiəm/|มี-ดี-อัม
+mental|/ˈmɛntəl/|เมน-ทัล
+meteor|/ˈmitiɚ/|มี-ที-เออร์
+method|/ˈmɛθəd/|เม-ธัด
+microbe|/ˈmaɪˌkroʊb/|ไม-โครบ
+migrate|/ˈmaɪˌɡreɪt/|ไม-เกรท
+migration|/maɪˈɡreɪʃən/|ไม-เกร-ชัน
+military|/ˈmɪləˌtɛri/|มิ-ละ-เท-รี
+mineral|/ˈmɪnɚəl/|มิ-เนอร์-อัล
+minimal|/ˈmɪnəməl/|มิ-นะ-มัล
+minimise|/ˈmɪnəˌmaɪz/|มิ-นะ-ไมซ์
+minimum|/ˈmɪnəməm/|มิ-นะ-มัม
+ministry|/ˈmɪnəstri/|มิ-นะ-สตรี
+minor|/ˈmaɪnɚ/|ไม-เนอร์
+mitigate|/ˈmɪtəˌɡeɪt/|มิ-ทะ-เกท
+mode|/ˈmoʊd/|โมด
+modify|/ˈmɑdəˌfaɪ/|มา-ดะ-ไฟ
+molecule|/ˈmɑləˌkjul/|มา-ละ-คยูล
+monitor|/ˈmɑnətɚ/|มา-นะ-เทอร์
+motivate|/ˈmoʊtəˌveɪt/|โม-ทะ-เวท
+mutation|/mjuˈteɪʃən/|มยู-เท-ชัน
+mutual|/ˈmjutʃuəl/|มยู-ชู-อัล
+navigate|/ˈnævəˌɡeɪt/|แน-วะ-เกท
+nebula|/ˈnɛbjələ/|เน-บยะ-ละ
+negate|/nɪˈɡeɪt/|นิ-เกท
+negation|/nəˈɡeɪʃən/|นะ-เก-ชัน
+negative|/ˈnɛɡətɪv/|เน-กะ-ทิฟ
+network|/ˈnɛˌtwɝk/|เน-เทวิร์ค
+neutral|/ˈnutrəl/|นู-ทรัล
+nevertheless|/ˌnɛvɚðəˈlɛs/|เน-เวอร์-ดะ-เลส
+node|/ˈnoʊd/|โนด
+normal|/ˈnɔrməl/|นอร์-มัล
+notable|/ˈnoʊtəbəl/|โน-ทะ-บัล
+notion|/ˈnoʊʃən/|โน-ชัน
+notwithstanding|/ˌnɑtwɪθˈstændɪŋ/|นา-ทวิธ-สแตน-ดิง
+nuclear|/ˈnukliɚ/|นู-คลี-เออร์
+nutrient|/ˈnutriənt/|นู-ทรี-อันท์
+objective|/əbˈdʒɛktɪv/|อับ-เจค-ทิฟ
+obligate|/ˈɑbləˌɡeɪt/|อา-บละ-เกท
+obscure|/əbsˈkjʊr/|อับส์-เคยอร์
+obsolete|/ˈɑbsəˌlit/|ออบ-ซะ-ลีท
+obtain|/əbˈteɪn/|อับ-เทน
+obvious|/ˈɑbviəs/|ออบ-วี-อัส
+occupy|/ˈɑkjəˌpaɪ/|อา-คยะ-ไพ
+occur|/əˈkɝ/|อะ-เคอร์
+odd|/ˈɑd/|ออด
+offset|/ɔfˈsɛt/|ออฟ-เซท
+ongoing|/ˈɑnˌɡoʊɪŋ/|ออน-โก-อิง
+optimal|/ˈɑptəməl/|ออพ-ทะ-มัล
+option|/ˈɑpʃən/|ออพ-ชัน
+orbit|/ˈɔrbət/|ออร์-บัท
+ore|/ˈɔr/|ออร์
+organism|/ˈɔrɡəˌnɪzəm/|ออร์-กะ-นิ-ซัม
+orient|/ˈɔriˌɛnt/|ออ-รี-เอนท์
+ornate|/ɔrˈneɪt/|ออร์-เนท
+outcome|/ˈaʊtˌkʌm/|อาวท์-คัม
+outline|/ˈaʊtˌlaɪn/|อาวท์-ไลน์
+output|/ˈaʊtˌpʊt/|อาวท์-พุท
+overall|/ˈoʊvɚˌɔl/|โอ-เวอร์-ออล
+overlap|/ˈoʊvɚˌlæp/|โอ-เวอร์-แลพ
+overseas|/ˈoʊvɚˈsiz/|โอ-เวอร์-ซีซ
+paradigm|/ˈpɛrəˌdaɪm/|เพ-ระ-ไดม์
+paradoxical|/ˌpɛrəˈdɑksɪkəl/|เพ-ระ-ดอค-ซิ-คัล
+paragraph|/ˈpærəˌɡræf/|แพ-ระ-แกรฟ
+parallel|/ˈpɛrəˌlɛl/|เพ-ระ-เลล
+parameter|/pɚˈæmətɚ/|เพอร์-แอ-มะ-เทอร์
+paramount|/ˈpɛrəˌmaʊnt/|เพ-ระ-มาวนท์
+parasite|/ˈpɛrəˌsaɪt/|เพ-ระ-ไซท์
+participate|/pɑrˈtɪsəˌpeɪt/|พาร์-ทิ-ซะ-เพท
+particle|/ˈpɑrtəkəl/|พาร์-ทะ-คัล
+partner|/ˈpɑrtnɚ/|พาร์ท-เนอร์
+passive|/ˈpæsɪv/|แพ-ซิฟ
+peculiar|/pəˈkjuljɚ/|พะ-คยู-เลยอร์
+perceive|/pɚˈsiv/|เพอร์-ซีฟ
+percent|/pɚˈsɛnt/|เพอร์-เซนท์
+period|/ˈpɪriəd/|พิ-รี-อัด
+peripheral|/pɚˈɪfɚəl/|เพอร์-อิ-เฟอร์-อัล
+persist|/pɚˈsɪst/|เพอร์-ซิสท์
+persistent|/pɚˈsɪstənt/|เพอร์-ซิ-สตันท์
+perspective|/pɚˈspɛktɪv/|เพอร์-สเปค-ทิฟ
+phase|/ˈfeɪz/|เฟซ
+phenomenon|/fəˈnɑməˌnɑn/|ฟะ-นา-มะ-นอน
+philosophy|/fəˈlɑsəfi/|ฟะ-ลา-ซะ-ฟี
+photosynthesis|/ˌfoʊtoʊˈsɪnθəsɪs/|โฟ-โท-ซิน-ธะ-ซิส
+physical|/ˈfɪzɪkəl/|ฟิ-ซิ-คัล
+plankton|/ˈplæŋktən/|แพลงค์-ทัน
+plateau|/plæˈtoʊ/|แพล-โท
+plausible|/ˈplɔzəbəl/|พลอ-ซะ-บัล
+plus|/ˈplʌs/|พลัส
+policy|/ˈpɑləsi/|พา-ละ-ซี
+portion|/ˈpɔrʃən/|พอร์-ชัน
+pose|/ˈpoʊz/|โพซ
+positive|/ˈpɑzətɪv/|พา-ซะ-ทิฟ
+potent|/ˈpoʊtənt/|โพ-ทันท์
+potential|/pəˈtɛnʃəl/|พะ-เทน-ชัล
+practitioner|/prækˈtɪʃənɚ/|แพรค-ทิ-ชะ-เนอร์
+pragmatic|/præɡˈmætɪk/|แพรก-แม-ทิค
+precede|/prɪˈsid/|พริ-ซีด
+precipitation|/prɪˌsɪpɪˈteɪʃən/|พริ-ซิ-พิ-เท-ชัน
+precise|/prɪˈsaɪs/|พริ-ไซส์
+predator|/ˈprɛdətɚ/|เพร-ดะ-เทอร์
+predict|/prɪˈdɪkt/|พริ-ดิคท์
+predominant|/prɪˈdɑmənənt/|พริ-ดา-มะ-นันท์
+preliminary|/prɪˈlɪməˌnɛri/|พริ-ลิ-มะ-เน-รี
+prepare|/priˈpɛr/|พรี-เพอร์
+preservation|/ˌprɛzɚˈveɪʃən/|เพร-เซอร์-เว-ชัน
+preserve|/prəˈzɝv/|พระ-เซิร์ฟ
+presume|/prɪˈzum/|พริ-ซูม
+prevailing|/prɪˈveɪlɪŋ/|พริ-เว-ลิง
+prevalent|/ˈprɛvələnt/|เพร-วะ-ลันท์
+previous|/ˈpriviəs/|พรี-วี-อัส
+prey|/ˈpreɪ/|เพร
+primary|/ˈpraɪˌmɛri/|ไพร-เม-รี
+principal|/ˈprɪnsəpəl/|พริน-ซะ-พัล
+principle|/ˈprɪnsəpəl/|พริน-ซะ-พัล
+prior|/ˈpraɪɚ/|ไพร-เออร์
+priority|/praɪˈɔrəti/|ไพร-ออ-ระ-ที
+pristine|/ˈprɪstin/|พริ-สตีน
+proceed|/prəˈsid/|พระ-ซีด
+process|/ˈprɑˌsɛs/|พรา-เซส
+professional|/prəˈfɛʃənəl/|พระ-เฟ-ชะ-นัล
+profound|/proʊˈfaʊnd/|โพร-ฟาวนด์
+prohibit|/proʊˈhɪbət/|โพร-ฮิ-บัท
+project|/ˈprɑdʒɛkt/|พรา-เจคท์
+proliferate|/proʊˈlɪfɚˌeɪt/|โพร-ลิ-เฟอร์-เอท
+prominent|/ˈprɑmənənt/|พรา-มะ-นันท์
+promote|/prəˈmoʊt/|พระ-โมท
+prone|/ˈproʊn/|โพรน
+proportion|/prəˈpɔrʃən/|พระ-พอร์-ชัน
+prospect|/ˈprɑspɛkt/|พรา-สเปคท์
+protocol|/ˈproʊtəˌkɑl/|โพร-ทะ-คอล
+psychology|/saɪˈkɑlədʒi/|ไซ-คา-ละ-จี
+publication|/ˌpʌblɪˈkeɪʃən/|พะ-บลิ-เค-ชัน
+publish|/ˈpʌblɪʃ/|พะ-บลิช
+purchase|/ˈpɝtʃəs/|เพอร์-ชัส
+pursue|/pɚˈsu/|เพอร์-ซู
+qualitative|/ˈkwɑləˌteɪtɪv/|ควา-ละ-เท-ทิฟ
+quote|/ˈkwoʊt/|โควท
+radiation|/ˌreɪdiˈeɪʃən/|เร-ดี-เอ-ชัน
+radical|/ˈrædəkəl/|แร-ดะ-คัล
+random|/ˈrændəm/|แรน-ดัม
+range|/ˈreɪndʒ/|เรนจ์
+ratio|/ˈreɪʃiˌoʊ/|เร-ชี-โอ
+rational|/ˈræʃənəl/|แร-ชะ-นัล
+react|/riˈækt/|รี-แอคท์
+recover|/rɪˈkʌvɚ/|ริ-คะ-เวอร์
+refine|/rəˈfaɪn/|ระ-ไฟน์
+reform|/rəˈfɔrm/|ระ-ฟอร์ม
+refute|/rɪˈfjut/|ริ-ฟยูท
+region|/ˈridʒən/|รี-จัน
+register|/ˈrɛdʒɪstɚ/|เร-จิ-สเตอร์
+regulate|/ˈrɛɡjəˌleɪt/|เร-กยะ-เลท
+reinforce|/ˌriɪnˈfɔrs/|รี-อิน-ฟอร์ส
+reject|/rɪˈdʒɛkt/|ริ-เจคท์
+relax|/rɪˈlæks/|ริ-แลคส์
+release|/riˈlis/|รี-ลีส
+relevant|/ˈrɛləvənt/|เร-ละ-วันท์
+reluctance|/rɪˈlʌktəns/|ริ-ลัค-ทันส์
+reluctant|/rɪˈlʌktənt/|ริ-ลัค-ทันท์
+rely|/rɪˈlaɪ/|ริ-ไล
+remove|/riˈmuv/|รี-มูฟ
+renaissance|/ˌrɛnəˈsɑns/|เร-นะ-ซอนส์
+reproduction|/ˌriprəˈdʌkʃən/|รี-พระ-ดัค-ชัน
+reptile|/ˈrɛptaɪl/|เรพ-ไทล์
+require|/ˌriˈkwaɪɚ/|รี-ไคว-เออร์
+research|/riˈsɝtʃ/|รี-เสิร์ช
+reside|/rɪˈzaɪd/|ริ-ไซด์
+resilient|/rɪˈzɪljənt/|ริ-ซิ-ลยันท์
+resolve|/riˈzɑlv/|รี-ซอลฟ์
+resource|/ˈrisɔrs/|รี-ซอร์ส
+respiration|/ˌrɛspɚˈeɪʃən/|เร-สเปอร์-เอ-ชัน
+respond|/rɪˈspɑnd/|ริ-สปอนด์
+restore|/rɪˈstɔr/|ริ-สตอร์
+restrain|/riˈstreɪn/|รี-สเตรน
+restrict|/riˈstrɪkt/|รี-สตริคท์
+retain|/rɪˈteɪn/|ริ-เทน
+reveal|/rɪˈvil/|ริ-วีล
+revenue|/ˈrɛvəˌnu/|เร-วะ-นู
+reverse|/rɪˈvɝs/|ริ-เวิร์ส
+revise|/rɪˈvaɪz/|ริ-ไวซ์
+revolution|/ˌrɛvəˈluʃən/|เร-วะ-ลู-ชัน
+rigid|/ˈrɪdʒəd/|ริ-จัด
+robust|/roʊˈbʌst/|โร-บัสท์
+role|/ˈroʊl/|โรล
+rotation|/roʊˈteɪʃən/|โร-เท-ชัน
+route|/ˈrut/|รูท
+satellite|/ˈsætəˌlaɪt/|แซ-ทะ-ไลท์
+scenario|/sɪˈnɛrioʊ/|ซิ-เน-รี-โอ
+schedule|/ˈskɛdʒʊl/|สเก-จุล
+scheme|/ˈskim/|สกีม
+scope|/ˈskoʊp/|สโกพ
+scrutinize|/ˈskrutəˌnaɪz/|สกรู-ทะ-ไนซ์
+sculpture|/ˈskʌlptʃɚ/|สกัลพ์-เชอร์
+section|/ˈsɛkʃən/|เซค-ชัน
+sector|/ˈsɛktɚ/|เซค-เทอร์
+secure|/sɪˈkjʊr/|ซิ-เคยอร์
+sediment|/ˈsɛdəmənt/|เซ-ดะ-มันท์
+seek|/ˈsik/|ซีค
+select|/səˈlɛkt/|ซะ-เลคท์
+sequence|/ˈsikwəns/|ซี-ควันส์
+series|/ˈsɪriz/|ซิ-รีซ
+sex|/ˈsɛks/|เซคส์
+shift|/ˈʃɪft/|ชิฟท์
+significant|/səɡˈnɪfɪkənt/|ซัก-นิ-ฟิ-คันท์
+similar|/ˈsɪməlɚ/|ซิ-มะ-เลอร์
+simulate|/ˈsɪmjələt/|ซิ-มยะ-ลัท
+site|/ˈsaɪt/|ไซท์
+so-called|/ˈsoʊˈkɔld/|โซ-คอลด์
+solar|/ˈsoʊlɚ/|โซ-เลอร์
+sole|/ˈsoʊl/|โซล
+somewhat|/ˈsʌmˈwʌt/|ซัม-วัท
+source|/ˈsɔrs/|ซอร์ส
+species|/ˈspiʃiz/|สปี-ชีซ
+specific|/spəˈsɪfɪk/|สปะ-ซิ-ฟิค
+specify|/ˈspɛsəˌfaɪ/|สเป-ซะ-ไฟ
+spectrum|/ˈspɛktrəm/|สเปค-ทรัม
+sphere|/ˈsfɪr/|เสฟอร์
+spontaneous|/spɑnˈteɪniəs/|สปอน-เท-นี-อัส
+stable|/ˈsteɪbəl/|สเต-บัล
+statistic|/stəˈtɪstɪk/|สตะ-ทิ-สติค
+status|/ˈstætəs/|สแต-ทัส
+straightforward|/ˈstreɪtˈfɔrwɚd/|สเตรท-ฟอร์-เวิร์ด
+strategy|/ˈstrætədʒi/|สแตร-ทะ-จี
+stratum|/ˈstrætəm/|สแตร-ทัม
+stress|/ˈstrɛs/|สเตรส
+structure|/ˈstrʌktʃɚ/|สตรัค-เชอร์
+style|/ˈstaɪl/|สไตล์
+submit|/səbˈmɪt/|ซับ-มิท
+subordinate|/səˈbɔrdəˌneɪt/|ซะ-บอร์-ดะ-เนท
+subsequent|/ˈsʌbsəkwənt/|ซับ-ซะ-ควันท์
+subsidy|/ˈsʌbsɪdi/|ซับ-ซิ-ดี
+substantial|/səbˈstænʃəl/|ซับ-สแตน-ชัล
+substitute|/ˈsʌbstəˌtut/|ซับ-สตะ-ทูท
+subtle|/ˈsʌtəl/|ซะ-ทัล
+successor|/səkˈsɛsɚ/|ซัค-เซ-เสอร์
+sufficient|/səˈfɪʃənt/|ซะ-ฟิ-ชันท์
+sum|/ˈsʌm/|ซัม
+summary|/ˈsʌmɚi/|ซะ-เมอร์-อี
+supplement|/ˈsʌpləmənt/|ซะ-พละ-มันท์
+survey|/sɚˈveɪ/|เสอร์-เว
+survive|/sɚˈvaɪv/|เสอร์-ไวฟ์
+susceptible|/səˈsɛptəbəl/|ซะ-เซพ-ทะ-บัล
+suspend|/səˈspɛnd/|ซะ-สเปนด์
+sustain|/səˈsteɪn/|ซะ-สเตน
+symbiosis|/ˌsɪmbaɪˈoʊsəs/|ซิม-ไบ-โอ-ซัส
+symbol|/ˈsɪmbəl/|ซิม-บัล
+tape|/ˈteɪp/|เทพ
+target|/ˈtɑrɡət/|ทาร์-กัท
+task|/ˈtæsk/|แทสค์
+team|/ˈtim/|ทีม
+technical|/ˈtɛknɪkəl/|เทค-นิ-คัล
+technique|/tɛkˈnik/|เทค-นีค
+technology|/tɛkˈnɑlədʒi/|เทค-นา-ละ-จี
+tectonic|/tɛkˈtɑnɪk/|เทค-ทา-นิค
+telescope|/ˈtɛləˌskoʊp/|เท-ละ-สโกพ
+temporary|/ˈtɛmpɚˌɛri/|เทม-เพอร์-เอ-รี
+tense|/ˈtɛns/|เทนส์
+tentative|/ˈtɛntətɪv/|เทน-ทะ-ทิฟ
+term|/ˈtɝm/|เทิร์ม
+terrain|/tɚˈeɪn/|เทอร์-เอน
+text|/ˈtɛkst/|เทคสท์
+theme|/ˈθim/|ธีม
+theory|/ˈθɪri/|ธิ-รี
+thereby|/ˈðɛrˈbaɪ/|เดอร์-ไบ
+thesis|/ˈθisəs/|ธี-ซัส
+threshold|/ˈθrɛˌʃoʊld/|เธร-โชลด์
+topic|/ˈtɑpɪk/|ทา-พิค
+trace|/ˈtreɪs/|เทรส
+tradition|/trəˈdɪʃən/|ทระ-ดิ-ชัน
+transfer|/trænˈsfɝ/|แทรน-สเฟอร์
+transform|/trænˈsfɔrm/|แทรน-สฟอร์ม
+transit|/ˈtrænzɪt/|แทรน-ซิท
+transmit|/trænzˈmɪt/|แทรนซ์-มิท
+transport|/trænˈspɔrt/|แทรน-สปอร์ท
+trend|/ˈtrɛnd/|เทรนด์
+ubiquitous|/juˈbɪkwɪtəs/|ยู-บิ-ควิ-ทัส
+ultimate|/ˈʌltəmət/|อัล-ทะ-มัท
+undergo|/ˌʌndɚˈɡoʊ/|อัน-เดอร์-โก
+underlie|/ˌʌndɚˈlaɪ/|อัน-เดอร์-ไล
+undermine|/ˈʌndɚˌmaɪn/|อัน-เดอร์-ไมน์
+undertake|/ˈʌndɚˌteɪk/|อัน-เดอร์-เทค
+uniform|/ˈjunəˌfɔrm/|ยู-นะ-ฟอร์ม
+unify|/ˈjunəˌfaɪ/|ยู-นะ-ไฟ
+unique|/juˈnik/|ยู-นีค
+unit|/ˈjunət/|ยู-นัท
+universe|/ˈjunəˌvɝs/|ยู-นะ-เวิร์ส
+urban|/ˈɝbən/|เออร์-บัน
+urbanization|/ˌɝbənəˈzeɪʃən/|เออร์-บะ-นะ-เซ-ชัน
+utilise|/ˈjutəˌlaɪz/|ยู-ทะ-ไลซ์
+utilize|/ˈjutəˌlaɪz/|ยู-ทะ-ไลซ์
+vacuum|/ˈvækjum/|แว-คยูม
+valid|/ˈvælɪd/|แว-ลิด
+vary|/ˈvɛri/|เว-รี
+vast|/ˈvæst/|แวสท์
+vegetation|/ˌvɛdʒəˈteɪʃən/|เว-จะ-เท-ชัน
+vehicle|/ˈvihɪkəl/|วี-ฮิ-คัล
+velocity|/vəˈlɑsəti/|วะ-ลา-ซะ-ที
+version|/ˈvɝʒən/|เวอร์-ชัน
+via|/ˈvaɪə/|ไว-อะ
+viable|/ˈvaɪəbəl/|ไว-อะ-บัล
+virtual|/ˈvɝtʃuəl/|เวอร์-ชู-อัล
+visible|/ˈvɪzəbəl/|วิ-ซะ-บัล
+vision|/ˈvɪʒən/|วิ-ชัน
+visual|/ˈvɪʒəwəl/|วิ-ชะ-วัล
+volcanic|/vɑlˈkænɪk/|วอล-แค-นิค
+volume|/ˈvɑljum/|วา-ลยูม
+voluntary|/ˈvɑləntɛri/|วา-ลัน-เท-รี
+welfare|/ˈwɛlˌfɛr/|เวล-เฟอร์
+whereas|/wɛˈræz/|เว-แรซ
+whereby|/wɛrˈbaɪ/|เวอร์-ไบ
+widespread|/ˈwaɪdˈsprɛd/|ไวด์-สเปรด
+xenophobia|/ˌzɛnəˈfoʊbiə/|เซ-นะ-โฟ-บี-อะ
+yield|/ˈjild/|ยีลด์
+zone|/ˈzoʊn/|โซน
+`;
+
+/* คำที่อยู่ในลิสต์ ITP 400 คำ: คำ|กลุ่ม (1=กริยา 2=คุณศัพท์ 4=คำนามวิชาการ) */
+const BANK_ITP = `
+abandon|1
+abound|1
+abstract|4
+abundant|2
+accelerate|1
+accommodate|1
+accumulate|1
+accurate|2
+acquire|1
+acute|2
+adapt|1
+adhere|1
+adjacent|2
+administer|1
+adverse|2
+advocate|1
+aesthetic|4
+alleviate|1
+alter|1
+ambiguous|2
+amphibian|4
+ample|2
+analyze|1
+ancestor|4
+ancient|2
+anticipate|1
+apply|1
+architecture|4
+arid|24
+artifact|4
+artificial|2
+ascertain|1
+assert|1
+assess|1
+assume|1
+asteroid|4
+atmosphere|4
+atom|4
+attain|1
+attribute|1
+augment|1
+authorize|1
+axis|4
+basin|4
+beneficial|2
+brittle|2
+canyon|4
+cease|1
+celestial|4
+chronic|2
+circulate|1
+civilization|4
+clarify|1
+climate|4
+coherent|2
+coincide|1
+collaborate|1
+comet|4
+commerce|4
+commodity|4
+comparable|2
+compel|1
+compensate|1
+compile|1
+comprehensive|2
+comprise|1
+concede|1
+conceive|1
+concise|2
+conduct|1
+confine|1
+considerable|2
+consistent|2
+consolidate|1
+conspicuous|2
+constitute|1
+constrain|1
+consult|1
+consume|1
+contemporary|2
+contradict|1
+contribute|1
+convert|1
+convey|1
+core|4
+correlate|1
+crucial|2
+crust|4
+currency|4
+decisive|2
+deduce|1
+deficient|2
+deliberate|2
+delta|4
+democracy|4
+demonstrate|1
+dense|2
+density|4
+depict|1
+digestion|4
+diminish|1
+diverse|2
+diversity|4
+dominant|2
+dormant|2
+drastic|2
+durable|2
+dynamic|2
+earthquake|4
+economy|4
+ecosystem|4
+efficient|2
+elaborate|2
+eminent|2
+empirical|2
+energy|4
+enormous|2
+era|4
+erosion|4
+essential|2
+ethics|4
+evaporation|4
+evident|2
+evolution|4
+excessive|2
+exotic|2
+explicit|2
+extensive|2
+external|2
+facilitate|1
+fauna|4
+feasible|2
+finite|2
+flora|4
+fluctuate|1
+forecast|1
+formulate|1
+fossil|4
+foster|1
+fragile|2
+fundamental|2
+galaxy|4
+generate|1
+glacier|4
+gravity|4
+habitat|4
+halt|1
+harness|1
+hazardous|2
+heritage|4
+hinder|1
+humid|4
+hypothesize|1
+identical|2
+identify|1
+illuminate|1
+illustrate|1
+imminent|2
+implement|1
+implicit|2
+imply|1
+inadequate|2
+incredible|2
+indicate|1
+induce|1
+inevitable|2
+inflation|4
+infrastructure|4
+inherent|2
+inhibit|1
+initial|2
+initiate|1
+innate|2
+innovative|2
+integrate|1
+intense|2
+interpret|1
+intervene|1
+intricate|2
+invaluable|2
+investigate|1
+invisible|2
+isolate|1
+isolated|2
+justify|1
+layer|4
+legislation|4
+legitimate|2
+lethal|2
+locate|1
+lucrative|2
+lunar|4
+magnitude|24
+maintain|1
+mammal|4
+manipulate|1
+mantle|4
+marginal|2
+mass|4
+massive|2
+meteor|4
+microbe|4
+migration|4
+mineral|4
+minimal|2
+modify|1
+molecule|4
+monitor|1
+mutation|4
+mutual|2
+nebula|4
+negate|1
+neutral|2
+notable|2
+nutrient|4
+objective|2
+obscure|2
+obsolete|2
+obtain|1
+occupy|1
+optimal|2
+orbit|4
+ore|4
+organism|4
+ornate|24
+outline|1
+paradoxical|2
+parasite|4
+participate|1
+particle|4
+passive|2
+peculiar|2
+perceive|1
+peripheral|2
+persist|1
+perspective|4
+philosophy|4
+photosynthesis|4
+plankton|4
+plateau|4
+plausible|2
+potent|2
+pragmatic|2
+precipitation|4
+precise|2
+predator|4
+predict|1
+preservation|4
+preserve|1
+prevailing|2
+prey|4
+pristine|2
+profound|2
+prominent|2
+promote|1
+pursue|1
+radiation|4
+radical|2
+random|2
+refine|1
+regulate|1
+reinforce|1
+release|1
+renaissance|4
+reproduction|4
+reptile|4
+resilient|2
+respiration|4
+retain|1
+rigid|2
+robust|2
+rotation|4
+satellite|4
+sculpture|4
+sediment|4
+shift|1
+solar|4
+species|4
+spectrum|4
+spontaneous|2
+stratum|4
+substantial|2
+subtle|2
+sustain|1
+symbiosis|4
+tectonic|4
+telescope|4
+terrain|4
+theory|4
+transform|1
+urbanization|4
+utilize|1
+vacuum|4
+vast|2
+vegetation|4
+velocity|4
+volcanic|4
+`;
+const ITP={};
+BANK_ITP.trim().split("\n").forEach(l=>{const p=l.split("|");if(p.length<2)return;ITP[p[0].trim()]=p[1].trim();});
+const ITP_COUNT=Object.keys(ITP).length;
+const WORDS = [];
+BANK_FULL.trim().split("\n").forEach(l=>{
+  const p=l.split("|"); if(p.length<7) return;
+  WORDS.push({w:p[0].trim(),pos:p[1].trim(),th:p[2].trim(),def:p[3].trim(),syn:p[4].trim(),g:p[5].trim(),sent:p[6].trim(),full:true});
+});
+BANK_BASIC.trim().split("\n").forEach(l=>{
+  const p=l.split("|"); if(p.length<3) return;
+  WORDS.push({w:p[0].trim(),pos:p[1].trim(),th:p[2].trim(),def:"",syn:"",g:"",sent:"",full:false});
+});
+const PRON={};
+BANK_PRON.trim().split("\n").forEach(l=>{const p=l.split("|");if(p.length<3)return;PRON[p[0].trim()]={ipa:p[1].trim(),th:p[2].trim()};});
+const FULL_COUNT = WORDS.filter(w=>w.full).length;
+const CAN_SPEAK = typeof window!=="undefined" && "speechSynthesis" in window;
+function speak(word){
+  if(!CAN_SPEAK) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(word);
+    u.lang="en-US"; u.rate=.85;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+const SPK=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 2.2v2.1a7.7 7.7 0 0 1 0 15.4v2.1A9.8 9.8 0 0 0 14 2.2z"/></svg>`;
+function pronBlock(w){
+  const p=PRON[w.w]; if(!p) return "";
+  return `<div class="pron">
+      ${CAN_SPEAK?`<button class="say" data-say="${esc(w.w)}" title="ฟังเสียงอ่าน" aria-label="ฟังเสียงอ่าน ${esc(w.w)}">${SPK}</button>`:""}
+      <span class="ipa">${esc(p.ipa)}</span><span class="thai">${esc(p.th)}</span>
+    </div>`;
+}
+const SORTED = WORDS.slice().sort((a,b)=>a.w.localeCompare(b.w));
+const SET_SIZE = 50;
+const SET_N = Math.ceil(SORTED.length/SET_SIZE);
+
+/* ---------------- storage ---------------- */
+const mem={};
+const LS=(()=>{try{const t="__t";localStorage.setItem(t,"1");localStorage.removeItem(t);return localStorage;}catch(e){return null;}})();
+const store={
+  async get(k){ try{ if(LS){const v=LS.getItem("cutep:"+k); if(v!=null) return JSON.parse(v);} if(window.storage){const r=await window.storage.get(k); if(r) return JSON.parse(r.value);} }catch(e){} return mem[k]??null; },
+  async set(k,v){ mem[k]=v; try{ if(LS) LS.setItem("cutep:"+k,JSON.stringify(v)); if(window.storage) await window.storage.set(k,JSON.stringify(v)); }catch(e){} }
+};
+let stats={sessions:0,answered:0,correct:0,best:0};
+let weak={};
+
+const S={mode:"mixed",scope:"all",len:10,timed:true,weakOnly:false,
+         queue:[],i:0,score:0,streak:0,bestStreak:0,correct:0,missed:[],locked:false,t:null,left:0};
+
+const $=s=>document.querySelector(s);
+const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[b[i],b[j]]=[b[j],b[i]];}return b;};
+const esc=s=>String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+document.getElementById("ticks").innerHTML="<i></i>".repeat(14);
+
+/* ---------------- setup UI ---------------- */
+$("#bankLine").textContent = `คลังศัพท์ ${WORDS.length} คำ · รวมลิสต์ ITP ${ITP_COUNT} คำ`;
+$("#lede").textContent = `ฝึกได้ 5 รูปแบบจากคลัง ${WORDS.length} คำ เลือกฝึกเฉพาะลิสต์ ITP ได้ ตอบผิดคำไหน ระบบจะจำไว้ให้กลับมาฝึกซ้ำจนแม่น`;
+(function buildScope(){
+  const sel=$("#scopeSel");
+  let html=`<option value="all">ทั้งคลัง — ${WORDS.length} คำ</option>`;
+  if(FULL_COUNT<WORDS.length) html+=`<option value="full">เฉพาะคำที่มีประโยคตัวอย่าง — ${FULL_COUNT} คำ</option>`;
+  const nItp=g=>WORDS.filter(w=>ITP[w.w]&&(!g||ITP[w.w].includes(g))).length;
+  html+=`<option value="itp">ลิสต์ ITP ทั้งหมด — ${nItp()} คำ</option>`;
+  html+=`<option value="itp:1">ลิสต์ ITP · กริยา — ${nItp("1")} คำ</option>`;
+  html+=`<option value="itp:2">ลิสต์ ITP · คุณศัพท์ — ${nItp("2")} คำ</option>`;
+  html+=`<option value="itp:4">ลิสต์ ITP · คำนามวิชาการ — ${nItp("4")} คำ</option>`;
+  for(let i=0;i<SET_N;i++){
+    const a=SORTED[i*SET_SIZE], b=SORTED[Math.min((i+1)*SET_SIZE,SORTED.length)-1];
+    html+=`<option value="set:${i}">ชุดที่ ${i+1} — ${a.w} ถึง ${b.w}</option>`;
+  }
+  sel.innerHTML=html;
+  sel.addEventListener("change",()=>{S.scope=sel.value;refreshNotes();});
+})();
+
+document.querySelectorAll("#modeOpts .opt").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("#modeOpts .opt").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true"); S.mode=b.dataset.mode; refreshNotes();
+  });
+});
+document.querySelectorAll("#lenChips .chip").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("#lenChips .chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true"); S.len=+b.dataset.len;
+  });
+});
+$("#timerChip").addEventListener("click",e=>{S.timed=!S.timed;e.currentTarget.setAttribute("aria-pressed",S.timed);});
+$("#weakChip").addEventListener("click",e=>{S.weakOnly=!S.weakOnly;e.currentTarget.setAttribute("aria-pressed",S.weakOnly);refreshNotes();});
+$("#startBtn").addEventListener("click",()=>startRound());
+$("#resetBtn").addEventListener("click",async()=>{
+  stats={sessions:0,answered:0,correct:0,best:0};weak={};
+  await store.set("cutep:stats",stats);await store.set("cutep:weak",weak);renderHome();
+});
+
+/* ---------------- pool ---------------- */
+function basePool(){
+  let pool=WORDS;
+  if(S.scope==="full") pool=pool.filter(w=>w.full);
+  else if(S.scope==="itp") pool=pool.filter(w=>ITP[w.w]);
+  else if(S.scope.startsWith("itp:")){
+    const g=S.scope.slice(4);
+    pool=pool.filter(w=>ITP[w.w]&&ITP[w.w].includes(g));
+  }
+  else if(S.scope.startsWith("set:")){
+    const i=+S.scope.slice(4);
+    pool=SORTED.slice(i*SET_SIZE,(i+1)*SET_SIZE);
+  }
+  if(S.mode==="synonym"||S.mode==="cloze") pool=pool.filter(w=>w.full);
+  if(S.weakOnly){
+    const ws=new Set(Object.keys(weak));
+    const f=pool.filter(w=>ws.has(w.w));
+    if(f.length>=4) pool=f;
+  }
+  return pool;
+}
+function refreshNotes(){
+  const n=basePool().length;
+  $("#modeNote").textContent = ((S.mode==="synonym"||S.mode==="cloze") && FULL_COUNT<WORDS.length)
+    ? `โหมดนี้ใช้ได้เฉพาะคำที่มีประโยคตัวอย่าง ${FULL_COUNT} คำ`
+    : (S.mode==="meaning" ? "โหมดนี้แสดงคำอ่านและปุ่มฟังเสียงให้ฝึกออกเสียง" : "");
+  $("#scopeNote").textContent = `คำที่พร้อมออกข้อสอบในเงื่อนไขนี้: ${n} คำ`;
+  $("#poolWarn").classList.toggle("hide", n>=4);
+  if(n<4) $("#poolWarn").textContent="เงื่อนไขนี้เหลือคำน้อยเกินไป ลองเปลี่ยนขอบเขตหรือปิดตัวกรอง";
+  $("#startBtn").disabled = n<4;
+}
+
+/* ---------------- question builder ---------------- */
+function thTokens(s){return s.split(/[\s,/()]+/).filter(t=>t.length>1);}
+function clash(a,b){
+  if(a.g&&b.g&&a.g===b.g) return true;
+  const t=new Set(thTokens(a.th));
+  return thTokens(b.th).some(x=>t.has(x));
+}
+function distractors(word,key,n){
+  const lw=word.w.toLowerCase(), ls=(word.syn||"").toLowerCase();
+  const pool=WORDS.filter(x=>{
+    if(x.w===word.w || !x[key] || x[key]===word[key] || clash(x,word)) return false;
+    // กันตัวลวงที่กลายเป็นคำตอบถูกไปด้วย เช่น โจทย์ attach แล้วมีตัวเลือก attach
+    if(key==="syn" && (x.syn||"").toLowerCase()===lw) return false;
+    if(key==="w" && x.w.toLowerCase()===ls) return false;
+    return true;
+  });
+  const out=[],used=new Set();
+  for(const c of shuffle(pool)){
+    if(used.has(c[key])) continue;
+    used.add(c[key]); out.push(c);
+    if(out.length===n) break;
+  }
+  return out;
+}
+function typesFor(w){
+  const t=["meaning","reverse","typing"];
+  if(w.full) t.push("synonym","cloze");
+  return t;
+}
+function makeQuestion(word,mode){
+  let type=mode;
+  if(mode==="mixed"){const t=typesFor(word);type=t[Math.random()*t.length|0];}
+  if(type==="typing") return {word,type};
+  const key = type==="meaning" ? "th" : type==="synonym" ? "syn" : "w";
+  const opts=shuffle([word,...distractors(word,key,3)]).map(o=>({text:o[key],ok:o.w===word.w}));
+  return {word,type,opts};
+}
+function buildQueue(){
+  const pool=basePool();
+  const need=Math.min(S.len,pool.length);
+  return shuffle(pool).slice(0,need).map(w=>makeQuestion(w,S.mode));
+}
+
+/* ---------------- flow ---------------- */
+function show(id){
+  ["screenStart","screenPlay","screenResult"].forEach(s=>$("#"+s).classList.toggle("hide",s!==id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function startRound(queue){
+  S.queue=queue||buildQueue();
+  if(!S.queue.length) return;
+  S.i=0;S.score=0;S.streak=0;S.bestStreak=0;S.correct=0;S.missed=[];
+  $("#timerBar").style.display=S.timed?"":"none";
+  show("screenPlay");renderQuestion();
+}
+function bindSay(root){
+  root.querySelectorAll("[data-say]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();speak(b.dataset.say);}));
+}
+function renderStrip(){
+  $("#strip").innerHTML=S.queue.map((q,idx)=>{
+    let c="pip";
+    if(q.result==="ok")c+=" ok";else if(q.result==="no")c+=" no";
+    if(idx===S.i)c+=" now";
+    return `<span class="${c}"></span>`;
+  }).join("");
+}
+const TYPE_LABEL={meaning:"ความหมายของคำ",reverse:"เลือกศัพท์ให้ตรงความหมาย",typing:"พิมพ์คำศัพท์",synonym:"คำที่ใกล้เคียงที่สุด",cloze:"เติมคำในประโยค"};
+
+function renderQuestion(){
+  const q=S.queue[S.i];S.locked=false;
+  $("#mNum").textContent=`${S.i+1}/${S.queue.length}`;
+  $("#mScore").textContent=S.score;
+  $("#mStreak").textContent=S.streak;
+  $("#qType").textContent=TYPE_LABEL[q.type];
+  renderStrip();
+
+  const w=q.word;
+  let prompt="";
+  if(q.type==="cloze") prompt=`<p class="prompt-sent">${esc(w.sent).replace("___","<u></u>")}</p>`;
+  else if(q.type==="meaning")
+    prompt=`<h2 class="prompt-word">${esc(w.w)}</h2><div class="pos" style="margin-bottom:8px">${esc(w.pos)}.${w.def?" &nbsp;"+esc(w.def):""}</div>${pronBlock(w)}`;
+  else if(q.type==="synonym")
+    prompt=`<h2 class="prompt-word">${esc(w.w)}</h2><div class="pos">${esc(w.pos)}.${w.def?" &nbsp;"+esc(w.def):""}</div>`;
+  else prompt=`<h2 class="prompt-th">${esc(w.th)}</h2><div class="pos">${esc(w.pos)}.</div>`;
+  $("#promptBox").innerHTML=prompt;
+  bindSay($("#promptBox"));
+
+  if(q.type==="typing"){
+    $("#answerOpts").innerHTML=`<div class="typebox">
+        <input id="typeIn" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="พิมพ์คำศัพท์ภาษาอังกฤษ">
+        <button class="btn" id="typeGo">ตรวจ</button>
+      </div><div class="type-hint">ขึ้นต้นด้วย "${esc(w.w[0])}" · ${w.w.length} ตัวอักษร</div>`;
+    $("#typeGo").addEventListener("click",()=>answer($("#typeIn").value));
+    $("#typeIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();answer($("#typeIn").value);}});
+    setTimeout(()=>$("#typeIn")&&$("#typeIn").focus(),50);
+    $("#keyHint").textContent="พิมพ์คำตอบแล้วกด Enter";
+  }else{
+    $("#answerOpts").innerHTML=q.opts.map((o,idx)=>
+      `<button class="opt" data-idx="${idx}"><span class="bub">${"ABCD"[idx]}</span><span class="label">${esc(o.text)}</span></button>`).join("");
+    document.querySelectorAll("#answerOpts .opt").forEach(b=>b.addEventListener("click",()=>answer(+b.dataset.idx)));
+    $("#keyHint").textContent="กด 1–4 เพื่อเลือกคำตอบ · P ฟังเสียงอ่าน · Enter ไปข้อถัดไป";
+  }
+
+  $("#feedback").innerHTML="";$("#nextRow").style.display="none";
+  if(S.timed) startTimer(); else stopTimer();
+}
+function startTimer(){
+  stopTimer();S.left=20;
+  const bar=$("#timerBar"),fill=bar.querySelector("i");
+  bar.classList.remove("warn");fill.style.transition="none";fill.style.width="100%";
+  requestAnimationFrame(()=>{fill.style.transition="width 1s linear";});
+  S.t=setInterval(()=>{
+    S.left--;fill.style.width=(S.left/20*100)+"%";
+    if(S.left<=5) bar.classList.add("warn");
+    if(S.left<=0){stopTimer();answer(-1);}
+  },1000);
+}
+function stopTimer(){if(S.t){clearInterval(S.t);S.t=null;}}
+function norm(s){return String(s).toLowerCase().trim().replace(/[-\s.]/g,"").replace(/ise$/,"ize").replace(/isation$/,"ization");}
+
+function answer(input){
+  if(S.locked) return;
+  S.locked=true;stopTimer();
+  const q=S.queue[S.i],w=q.word;
+  let ok=false,timedOut=(input===-1);
+
+  if(q.type==="typing"){
+    ok = !timedOut && norm(input)===norm(w.w);
+    const inp=$("#typeIn");
+    if(inp){inp.disabled=true;inp.style.borderBottomColor=ok?"var(--green)":"var(--red)";}
+    const go=$("#typeGo"); if(go) go.disabled=true;
+  }else{
+    ok = !timedOut && q.opts[input] && q.opts[input].ok;
+    document.querySelectorAll("#answerOpts .opt").forEach((b,i)=>{
+      b.disabled=true;
+      if(q.opts[i].ok) b.classList.add("correct");
+      else if(i===input) b.classList.add("wrong");
+    });
+  }
+  q.result=ok?"ok":"no";
+
+  if(ok){
+    S.correct++;S.streak++;S.bestStreak=Math.max(S.bestStreak,S.streak);
+    S.score+=100+Math.min(S.streak,5)*20+(S.timed?S.left*5:0);
+    if(weak[w.w]){weak[w.w]--;if(weak[w.w]<=0)delete weak[w.w];}
+  }else{
+    S.streak=0;S.missed.push(w);weak[w.w]=(weak[w.w]||0)+1;
+  }
+  stats.answered++;if(ok)stats.correct++;stats.best=Math.max(stats.best,S.bestStreak);
+  $("#mScore").textContent=S.score;$("#mStreak").textContent=S.streak;renderStrip();
+
+  const head = timedOut?`<div class="fb-head bad">หมดเวลา</div>`
+             : ok?`<div class="fb-head good">ถูกต้อง</div>`
+                 :`<div class="fb-head bad">ยังไม่ใช่</div>`;
+  const p=PRON[w.w];
+  const pronLine = p?`<div class="fb-pron">${esc(p.ipa)} &nbsp;·&nbsp; ${esc(p.th)}${CAN_SPEAK?` <button class="say" data-say="${esc(w.w)}" style="width:24px;height:24px;vertical-align:middle;margin-left:6px" aria-label="ฟังเสียงอ่าน">${SPK}</button>`:""}</div>`:"";
+  const extra = w.full
+    ? `<div class="fb-line">คำใกล้เคียง: <em>${esc(w.syn)}</em></div>
+       <div class="fb-line">${esc(w.sent).replace("___","<em>"+esc(w.w)+"</em>")}</div>`
+    : (w.def?`<div class="fb-line">${esc(w.def)}</div>`:"");
+  $("#feedback").innerHTML=`<div class="feedback ${ok?"good":"bad"}">
+      ${head}
+      <div><span class="fb-word">${esc(w.w)}</span> <span style="color:var(--graphite)">(${esc(w.pos)}.)</span> — ${esc(w.th)}</div>
+      ${pronLine}
+      ${extra}
+    </div>`;
+  bindSay($("#feedback"));
+  $("#nextRow").style.display="flex";
+  $("#nextBtn").textContent=S.i+1>=S.queue.length?"ดูผลคะแนน":"ข้อถัดไป";
+  $("#nextBtn").focus();
+}
+$("#nextBtn").addEventListener("click",()=>{
+  if(S.i+1>=S.queue.length) finish(); else {S.i++;renderQuestion();}
+});
+$("#quitBtn").addEventListener("click",()=>{stopTimer();persist();show("screenStart");renderHome();});
+async function persist(){await store.set("cutep:stats",stats);await store.set("cutep:weak",weak);}
+
+async function finish(){
+  stopTimer();stats.sessions++;await persist();
+  const acc=Math.round(S.correct/S.queue.length*100);
+  $("#rScore").textContent=S.score;
+  $("#rVerdict").textContent=acc>=90?"แม่นมาก พร้อมสอบ":acc>=70?"ดีแล้ว เก็บอีกนิด":acc>=50?"ต้องทบทวนเพิ่ม":"กลับไปดูศัพท์อีกรอบ";
+  $("#rCorrect").textContent=`${S.correct}/${S.queue.length}`;
+  $("#rAcc").textContent=acc+"%";
+  $("#rStreak").textContent=S.bestStreak;
+  if(S.missed.length){
+    $("#missedBox").classList.remove("hide");
+    $("#missedList").innerHTML=S.missed.map(w=>
+      `<li><span class="w">${esc(w.w)}</span><span class="m">${esc(w.th)}${w.syn?" · "+esc(w.syn):""}</span></li>`).join("");
+  }else $("#missedBox").classList.add("hide");
+  $("#drillBtn").disabled=S.missed.length===0;
+  show("screenResult");
+}
+$("#againBtn").addEventListener("click",()=>startRound());
+$("#drillBtn").addEventListener("click",()=>startRound(shuffle(S.missed.slice()).map(w=>makeQuestion(w,S.mode))));
+$("#homeBtn").addEventListener("click",()=>{show("screenStart");renderHome();});
+
+document.addEventListener("keydown",e=>{
+  if($("#screenPlay").classList.contains("hide")) return;
+  const q=S.queue[S.i];
+  if(!S.locked && q && q.type!=="typing" && ["1","2","3","4"].includes(e.key)){answer(+e.key-1);e.preventDefault();}
+  if(S.locked && (e.key==="Enter"||e.key===" ")){$("#nextBtn").click();e.preventDefault();}
+  if((e.key==="p"||e.key==="P") && q && document.activeElement.id!=="typeIn"){speak(q.word.w);}
+});
+
+/* ---------------- boot ---------------- */
+async function boot(){
+  stats=(await store.get("cutep:stats"))||stats;
+  weak=(await store.get("cutep:weak"))||weak;
+  renderHome();
+}
+function renderHome(){
+  const n=Object.keys(weak).length;
+  $("#weakCount").textContent=n?`มีคำที่เคยตอบผิดอยู่ ${n} คำ`:"ยังไม่มีคำที่ตอบผิดในคลังทบทวน";
+  $("#lifetime").textContent=stats.answered
+    ?`สะสม: ตอบไปแล้ว ${stats.answered} ข้อ · ถูก ${Math.round(stats.correct/stats.answered*100)}% · ต่อเนื่องสูงสุด ${stats.best}`:"";
+  $("#sheetNo").textContent="FORM "+String((stats.sessions||0)+1).padStart(2,"0");
+  refreshNotes();
+}
+boot();
+</script>
+</body>
+</html>
